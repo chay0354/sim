@@ -1,0 +1,5 @@
+# Word doc - terms are in terms.html
+*.docx
+# Git and IDE
+.git
+.cursor

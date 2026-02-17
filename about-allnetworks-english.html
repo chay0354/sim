@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About AllNetworks</title>
+  <style>
+    :root{
+      --brand:#1976d2;
+      --brand2:#0f4c81;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --ok:#16a34a;
+      --border:#e5e7eb;
+      --shadow: 0 10px 30px rgba(0,0,0,0.10);
+      --radius: 14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:0 20px 64px;}
+    .hero{
+      text-align:center;
+      padding:70px 20px 55px;
+      background: linear-gradient(135deg, var(--brand2), var(--brand));
+      color:#fff;
+      margin-bottom: 26px;
+    }
+    .badge{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 14px;
+      border-radius:999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.95);
+      font-size:14px;
+    }
+    .hero h1{
+      margin:18px 0 10px;
+      font-size:40px;
+      color:#fff;
+    }
+    .hero h1 span{ opacity: .95; }
+    .sub{
+      margin: 0 auto 22px;
+      max-width: 820px;
+      font-size:18px;
+      line-height:1.7;
+      color: rgba(255,255,255,0.95);
+    }
+    .grid{
+      margin-top:28px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+      gap:18px;
+    }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding:20px 18px;
+      box-shadow: var(--shadow);
+    }
+    .card h3{
+      margin:0 0 10px;
+      font-size:18px;
+      color: var(--brand2);
+    }
+    .card ul{margin:0; padding-left:18px; line-height:1.8; color: var(--text);}
+    .mission{
+      margin-top:26px;
+      padding:22px;
+      border-radius: var(--radius);
+      border:1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      text-align:center;
+    }
+    .mission h3{margin:0 0 10px; color: var(--brand2);}
+    .mission p{margin:0 auto; max-width:820px; color: var(--muted); line-height:1.7;}
+    .footer{
+      margin-top:26px;
+      text-align:center;
+      color: var(--muted);
+      font-size:13px;
+    }
+    .return-btn{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background: var(--card);
+      color: var(--brand2);
+      text-decoration: none;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-weight: 700;
+      box-shadow: var(--shadow);
+    }
+    .return-btn:hover{
+      filter: brightness(0.98);
+      text-decoration: none;
+      color: var(--brand2);
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <a href="index.html" class="return-btn">← Return to Home</a>
+    <section class="hero">
+      <div class="badge">Smart Communication Solutions in Israel</div>
+      <h1>About <span>AllNetworks</span></h1>
+      <p class="sub">
+        AllNetworks specializes in advanced communication solutions in Israel, with a strong focus on fast, simple, and digital-first service.
+        Whether you are visiting, studying, working, or managing a business — we keep you connected with ease.
+      </p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h3>📡 What We Offer</h3>
+        <ul>
+          <li>SIM Cards</li>
+          <li>Advanced eSIM Solutions</li>
+          <li>Data, Calls & SMS Plans</li>
+          <li>Top‑Up Services</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>⚡ Why Choose Us</h3>
+        <ul>
+          <li>Quick & Easy Activation</li>
+          <li>Competitive Pricing</li>
+          <li>Instant Digital Delivery (eSIM)</li>
+          <li>Friendly Customer Support</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>👥 Who We Serve</h3>
+        <ul>
+          <li>Tourists</li>
+          <li>Students</li>
+          <li>Recruitment & Manpower Agencies</li>
+          <li>Group & Bulk Buyers</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="mission">
+      <h3>🎯 Our Mission</h3>
+      <p>
+        Our goal is to make staying connected in Israel simple, fast, and reliable —
+        delivering a smooth digital experience and solutions tailored to each customer’s needs.
+      </p>
+    </section>
+
+    <section class="footer">
+      © AllNetworks
+    </section>
+  </main>
+</body>
+</html>

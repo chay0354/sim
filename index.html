@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AllNetworks – Top Up, SIM & eSIM</title>
+  <meta name="description" content="Top up and order SIM/eSIM in minutes. Choose a new number, pick eSIM or physical SIM, select a number, enter details, and choose payment." />
+
+  <style>
+    :root{
+      --brand:#1976d2;
+      --brand2:#0f4c81;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --ok:#16a34a;
+      --wa:#25D366;
+      --line:#06C755;
+      --border:#e5e7eb;
+      --shadow: 0 10px 30px rgba(0,0,0,0.10);
+      --shadow2: 0 6px 18px rgba(0,0,0,0.18);
+      --radius: 14px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    header{
+      background: linear-gradient(135deg, var(--brand2), var(--brand));
+      color:#fff;
+      padding: 70px 20px 55px;
+      text-align:center;
+    }
+    header h1{
+      font-size: 46px;
+      margin:0 0 10px;
+      letter-spacing: .2px;
+    }
+    header p{
+      font-size: 18px;
+      max-width: 820px;
+      margin: 0 auto 18px;
+      opacity: .95;
+    }
+
+    .pill-row{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top: 14px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 14px;
+    }
+
+    .cta-row{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top: 20px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      text-decoration:none;
+      font-weight: 800;
+      border: 0;
+      cursor:pointer;
+      box-shadow: var(--shadow2);
+      user-select:none;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn.wa{ background: var(--wa); color:#fff; }
+    .btn.wa:hover{ filter: brightness(0.95); }
+    .btn.line{ background: var(--line); color:#fff; }
+    .btn.line:hover{ filter: brightness(0.95); }
+    .btn.primary{ background: #ffffff; color: var(--brand2); box-shadow: none; border: 1px solid rgba(255,255,255,0.35); }
+    .btn.primary:hover{ background: rgba(255,255,255,0.92); }
+
+    .container{
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 26px 18px 60px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: stretch; /* make both columns the same height */
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .panel{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel h2{
+      margin:0 0 8px;
+      font-size: 22px;
+      color: var(--brand2);
+    }
+    .panel p{
+      margin:0 0 14px;
+      color: var(--muted);
+      font-size: 14.5px;
+    }
+
+    .features{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 560px){
+      .features{ grid-template-columns: 1fr; }
+    }
+    .card{
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+    .card h3{
+      margin:0 0 6px;
+      color: var(--brand);
+      font-size: 16px;
+    }
+    .card p{
+      margin:0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Wizard */
+    .steps{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin: 14px 0 14px;
+    }
+    .step-chip{
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: #fff;
+    }
+    .step-chip.active{
+      border-color: rgba(25,118,210,0.35);
+      background: rgba(25,118,210,0.08);
+      color: var(--brand2);
+      font-weight: 700;
+    }
+    .step-chip.done{
+      border-color: rgba(22,163,74,0.35);
+      background: rgba(22,163,74,0.10);
+      color: #0f5132;
+      font-weight: 700;
+    }
+
+    .fieldset{
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+    .fieldset legend{
+      padding: 0 8px;
+      color: var(--brand2);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 680px){
+      .row{ grid-template-columns: 1fr; }
+    }
+
+    label{ font-size: 14px; color: var(--text); }
+    .hint{ font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+    input[type="text"], input[type="email"], input[type="tel"], select{
+      width:100%;
+      margin-top: 6px;
+      padding: 12px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      font-size: 14.5px;
+      background: #fff;
+    }
+    input:focus, select:focus{
+      border-color: rgba(25,118,210,0.55);
+      box-shadow: 0 0 0 3px rgba(25,118,210,0.12);
+    }
+
+    .radio-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 560px){
+      .radio-grid{ grid-template-columns: 1fr; }
+    }
+
+    .radio-card{
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      cursor:pointer;
+      transition: transform .04s ease;
+      background:#fff;
+    }
+    .radio-card:hover{ transform: translateY(-1px); }
+    .radio-card input{ margin-top: 2px; }
+    .radio-card strong{ display:block; font-size: 14.5px; color: var(--text); }
+    .radio-card span{ display:block; font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items:center;
+      margin-top: 16px;
+    }
+    .btn-small{
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor:pointer;
+    }
+    .btn-small.primary{
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+    .btn-small.primary:hover{ filter: brightness(0.95); }
+    .btn-small.ghost:hover{ background: rgba(0,0,0,0.03); }
+
+    .summary{
+      display:grid;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+    .summary .item{
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .summary .item b{ color: var(--muted); font-weight: 700; }
+
+    .note{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(25,118,210,0.25);
+      background: rgba(25,118,210,0.07);
+      color: var(--brand2);
+      font-size: 13.5px;
+    }
+
+    /* Floating buttons */
+    .float{
+      position: fixed;
+      right: 18px;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+    .float a{
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      font-size: 18px;
+      font-weight: 900;
+      color:#fff;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    }
+    .float .wa{ background: var(--wa); }
+    .float .li{ background: var(--line); }
+    .float{ bottom: 18px; }
+    .float a:hover{ filter: brightness(0.95); }
+
+    footer{
+      background: var(--brand2);
+      color:#fff;
+      text-align:center;
+      padding: 20px;
+      font-size: 14px;
+    }
+    .footer-links{
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .footer-links a{
+      color: rgba(255,255,255,0.95);
+      text-decoration: none;
+    }
+    .footer-links a:hover{
+      text-decoration: underline;
+      color: #fff;
+    }
+    .footer-small{
+      opacity: .9;
+      font-size: 12.5px;
+      margin-top: 6px;
+    }
+
+    .hidden{ display:none !important; }
+    .push-bottom{ margin-top: auto; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>AllNetworks</h1>
+    <p>Top up or order a new SIM/eSIM in minutes. Choose new number or top up, pick eSIM or physical SIM, enter your details, and choose payment.</p>
+
+    <div class="pill-row">
+      <div class="pill">⚡ Fast activation</div>
+      <div class="pill">📶 Huge data packages</div>
+      <div class="pill">☎️ New number options</div>
+      <div class="pill">✅ eSIM or Physical SIM</div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn wa" target="_blank"
+        href="https://wa.me/972512965990?text=Hello%20AllNetworks%2C%20I%20want%20to%20top%20up%20or%20order%20a%20SIM%2FeSIM">
+        💬 WhatsApp
+      </a>
+      <a class="btn line" target="_blank" href="https://line.me/ti/p/oL-RT-PVJX">
+        💚 LINE
+      </a>
+      <a class="btn primary" href="#topup">Start top up / order</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <!-- LEFT: Wizard -->
+      <section class="panel" id="topup">
+        <h2>Top Up / Order SIM</h2>
+        <p>Follow the steps below. At the end you can submit the order or send it directly on WhatsApp.</p>
+
+        <div class="steps" id="stepChips">
+          <div class="step-chip active" data-step="1">1) Plan</div>
+          <div class="step-chip" data-step="2">2) SIM Type</div>
+          <div class="step-chip" data-step="3">3) Details</div>
+          <div class="step-chip" data-step="4">4) Payment</div>
+        </div>
+<form id="orderForm" novalidate>
+          <!-- STEP 1 -->
+          <div class="step" data-step="1">
+            <fieldset class="fieldset">
+              <legend>Step 1 — What do you want?</legend>
+
+              <div class="radio-grid">
+                <label class="radio-card">
+                  <input type="radio" name="orderType" value="New mobile number" required>
+                  <div>
+                    <strong>New mobile number</strong>
+                    <span>Get a new Israeli number (choose from our list).</span>
+                  </div>
+                </label>
+
+                <label class="radio-card">
+                  <input type="radio" name="orderType" value="Top up existing SIM">
+                  <div>
+                    <strong>Top up existing SIM</strong>
+                    <span>Add a package to your current AllNetworks line.</span>
+                  </div>
+                </label>
+              </div>
+
+              <div class="row">
+                <label id="packageLabelWrap">
+                  Package / Amount
+                  <select name="package" id="packageSelect" required>
+                    <option value="" selected disabled>Select package</option>
+                    <option value="45 NIS / month – 500GB + calls/SMS">45 NIS / month – 500GB + calls/SMS</option>
+                    <option value="Custom top up (agent will confirm)">Custom top up (agent will confirm)</option>
+                  </select>
+                  <div class="hint">You can change package later on WhatsApp if needed.</div>
+                </label>
+
+                <label id="quantityLabelWrap">
+                  Quantity
+                  <select name="quantity" id="quantityInput" required>
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                  <div class="hint">Number of SIM cards to order (only for new numbers).</div>
+                </label>
+
+                <label id="existingNumberLabelWrap" class="hidden">
+                  Existing number (only if top up)
+                  <input type="tel" name="existingNumber" id="existingNumberInput" placeholder="e.g. 05X-XXXXXXX">
+                  <div class="hint">If you selected "Top up existing SIM", add the number you want to top up.</div>
+                </label>
+              </div>
+
+              <label style="display:block; margin-top:14px;">
+                Coupon Code (optional)
+                <div style="display:flex; gap:8px; margin-top:6px;">
+                  <input type="text" name="couponCode" id="couponCode" placeholder="Enter coupon code" style="flex:1;">
+                  <button type="button" class="btn-small ghost" id="applyCouponBtn" style="white-space:nowrap;">Apply</button>
+                  <button type="button" class="btn-small ghost hidden" id="removeCouponBtn" style="white-space:nowrap;">Remove</button>
+                </div>
+                <div class="hint" id="couponHint">Enter a coupon code to get a discount.</div>
+              </label>
+            </fieldset>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="step hidden" data-step="2">
+            <fieldset class="fieldset">
+              <legend>Step 2 — Choose SIM type</legend>
+
+              <div class="radio-grid">
+                <label class="radio-card">
+                  <input type="radio" name="simType" value="eSIM" required>
+                  <div>
+                    <strong>eSIM</strong>
+                    <span>Instant activation. No physical SIM needed (phone must support eSIM).</span>
+                  </div>
+                </label>
+
+                <label class="radio-card">
+                  <input type="radio" name="simType" value="Physical SIM" required>
+                  <div>
+                    <strong>Physical SIM card</strong>
+                    <span>Pickup / delivery options (agent will confirm).</span>
+                  </div>
+                </label>
+              </div>
+
+              <div class="note">
+                Tip: If you are not sure, choose eSIM and we’ll confirm your phone compatibility.
+              </div>
+            </fieldset>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="step hidden" data-step="3">
+            <fieldset class="fieldset">
+              <legend>Step 3 — Your details</legend>
+
+              <div class="row">
+                <label>
+                  First name
+                  <input type="text" name="firstName" required placeholder="First name">
+                </label>
+
+                <label>
+                  Last name
+                  <input type="text" name="lastName" required placeholder="Last name">
+                </label>
+              </div>
+
+              <div class="row">
+                <label>
+                  Country code
+                  <input type="text" name="countryCode" list="countryCodes" required placeholder="+972">
+                  <datalist id="countryCodes">
+                    <option value="+972">Israel (+972)</option>
+                    <option value="+66">Thailand (+66)</option>
+                    <option value="+1">USA/Canada (+1)</option>
+                    <option value="+44">UK (+44)</option>
+                    <option value="+61">Australia (+61)</option>
+                    <option value="+49">Germany (+49)</option>
+                    <option value="+33">France (+33)</option>
+                    <option value="+39">Italy (+39)</option>
+                    <option value="+34">Spain (+34)</option>
+                    <option value="+55">Brazil (+55)</option>
+                    <option value="+52">Mexico (+52)</option>
+                    <option value="+81">Japan (+81)</option>
+                    <option value="+82">South Korea (+82)</option>
+                    <option value="+86">China (+86)</option>
+                    <option value="+84">Vietnam (+84)</option>
+                    <option value="+62">Indonesia (+62)</option>
+                    <option value="+63">Philippines (+63)</option>
+                    <option value="+60">Malaysia (+60)</option>
+                    <option value="+65">Singapore (+65)</option>
+                    <option value="+91">India (+91)</option>
+                  </datalist>
+                  <div class="hint">Start with + and digits (example: +66).</div>
+                </label>
+
+                <label>
+                  Mobile number
+                  <input type="tel" name="mobile" id="mobileInput" required placeholder="Phone number (no country code)">
+                  <div class="hint">Example: 812345678 (no +).</div>
+                </label>
+              </div>
+
+              <!-- Phone Verification Section -->
+              <div id="phoneVerificationWrap" style="margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:#fff;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                  <div>
+                    <strong style="color:var(--brand2);">Phone Verification *</strong>
+                    <div class="hint" style="margin-top:4px;">Verify the phone number entered above to continue to payment</div>
+                    <div id="phoneNumberDisplay" class="hint" style="margin-top:4px; font-weight:600; color:var(--text);"></div>
+                  </div>
+                  <span id="verificationStatus" style="font-size:12px; padding:4px 8px; border-radius:6px; background:var(--muted); color:#fff;">Not verified</span>
+                </div>
+                
+                <div id="verificationStep1" style="display:flex; gap:8px; margin-top:10px;">
+                  <button type="button" class="btn-small primary" id="sendOTPBtn" style="flex:1;">Send Verification Code</button>
+                </div>
+                
+                <div id="verificationStep2" class="hidden" style="margin-top:10px;">
+                  <div class="hint" style="margin-bottom:8px;">Enter the 6-digit code sent to your phone:</div>
+                  <div style="display:flex; gap:8px;">
+                    <input type="text" id="otpCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}" style="flex:1; text-align:center; font-size:18px; letter-spacing:4px; font-weight:bold;">
+                    <button type="button" class="btn-small primary" id="verifyOTPBtn">Verify</button>
+                  </div>
+                  <div style="display:flex; gap:8px; margin-top:8px;">
+                    <button type="button" class="btn-small ghost" id="resendOTPBtn" style="flex:1;">Resend Code</button>
+                  </div>
+                  <div class="hint" id="otpHint" style="margin-top:6px;"></div>
+                </div>
+              </div>
+
+              <label id="emailWrap" style="display:block; margin-top:14px;">
+                Email address (optional)
+                <input type="email" name="email" placeholder="you@example.com">
+              </label>
+              <div id="addressWrap" class="hidden" style="margin-top:10px;">
+                <div class="row">
+                  <label>
+                    Country
+                    <input type="text" name="addrCountry" placeholder="Country">
+                  </label>
+
+                  <label>
+                    City
+                    <input type="text" name="addrCity" placeholder="City">
+                  </label>
+                </div>
+
+                <div class="row">
+                  <label>
+                    Address
+                    <input type="text" name="addrStreet" placeholder="Street, building, apartment">
+                  </label>
+
+                  <label>
+                    ZIP / Postal code
+                    <input type="text" name="addrZip" placeholder="ZIP / Postal code">
+                  </label>
+                </div>
+
+                <div class="hint">Required only if you choose New mobile number + Physical SIM.</div>
+              </div>
+
+            </fieldset>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="step hidden" data-step="4">
+            <fieldset class="fieldset">
+              <legend>Step 4 — Payment method</legend>
+
+              <div class="radio-grid">
+                <label class="radio-card">
+                  <input type="radio" name="payment" value="Credit card" required>
+                  <div>
+                    <strong>Credit card</strong>
+                    <span>You can pay online or we’ll confirm the details.</span>
+                  </div>
+                </label>
+
+                <label class="radio-card">
+                  <input type="radio" name="payment" value="Bit / PayBox">
+                  <div>
+                    <strong>Bit / PayBox</strong>
+                    <span>Pay quickly from your phone.</span>
+                  </div>
+                </label>
+
+                <label class="radio-card">
+                  <input type="radio" name="payment" value="Bank transfer">
+                  <div>
+                    <strong>Bank transfer</strong>
+                    <span>We’ll provide details after confirmation.</span>
+                  </div>
+                </label>
+
+                <label class="radio-card">
+                  <input type="radio" name="payment" value="Cash (pickup)">
+                  <div>
+                    <strong>Cash (pickup)</strong>
+                    <span>Pay when you pick up the SIM (if available).</span>
+                  </div>
+                </label>
+              </div>
+
+              <label class="terms-accept" style="display:flex; align-items:flex-start; gap:10px; margin-top:18px; cursor:pointer;">
+                <input type="checkbox" name="acceptTerms" id="acceptTerms" required style="margin-top:4px;">
+                <span>I confirm that I have read and agree to the <a href="terms.html" target="_blank" rel="noopener noreferrer" style="color:var(--brand); font-weight:600;" onclick="window.open(this.href, '_blank'); return false;">Terms of Use and Privacy Policy</a>.</span>
+              </label>
+
+              <div class="summary" id="summary">
+                <div class="item"><b>Order:</b> <span id="sOrder">—</span></div>
+                <div class="item"><b>Package:</b> <span id="sPack">—</span></div>
+                <div class="item"><b>SIM Type:</b> <span id="sSim">—</span></div>
+                <div class="item"><b>Number:</b> <span id="sNum">—</span></div>
+                <div class="item"><b>Name:</b> <span id="sName">—</span></div>
+                <div class="item" id="emailSummaryRow"><b>Email:</b> <span id="sEmail">—</span></div>
+                <div class="item hidden" id="addrSummaryRow"><b>Address:</b> <span id="sAddr">—</span></div>
+                <div class="item hidden" id="couponSummaryRow"><b>Coupon:</b> <span id="sCoupon">—</span></div>
+                <div class="item hidden" id="discountSummaryRow"><b>Discount:</b> <span id="sDiscount" style="color:var(--ok);">—</span></div>
+                <div class="item hidden" id="shippingSummaryRow"><b>Shipping (Physical SIM):</b> <span id="sShipping" style="color:var(--text);">40 ILS</span></div>
+                <div style="margin-top:12px; padding-top:12px; border-top:2px solid var(--border);"></div>
+                <div class="item hidden" id="packagePriceRow"><b>Package Price:</b> <span id="sPackagePrice">—</span></div>
+                <div class="item hidden" id="subtotalPriceRow"><b>Subtotal:</b> <span id="sSubtotal">—</span></div>
+                <div class="item" id="totalPriceRow" style="font-weight:800; font-size:16px; color:var(--brand2);"><b>Total:</b> <span id="sTotal">—</span></div>
+                <div class="item"><b>Payment:</b> <span id="sPay">—</span></div>
+              </div>
+
+            </fieldset>
+
+            <div class="actions">
+              <button type="button" class="btn-small ghost" id="sendWhatsApp">Send order on WhatsApp</button>
+              <button type="submit" class="btn-small primary">Submit order</button>
+            </div>
+
+            <div class="hint" id="submitHint" style="margin-top:10px;"></div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn-small ghost" id="backBtn">← Back</button>
+            <button type="button" class="btn-small primary" id="nextBtn">Next →</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- RIGHT: Info -->
+      <aside class="panel">
+        <h2>Why AllNetworks?</h2>
+        <p>Fast setup, reliable service, and easy support on WhatsApp & LINE.</p>
+
+        <div class="features">
+          <div class="card">
+            <h3>eSIM Ready</h3>
+            <p>Instant activation for compatible phones.</p>
+          </div>
+          <div class="card">
+            <h3>High Data</h3>
+            <p>Strong packages for heavy internet users.</p>
+          </div>
+          <div class="card">
+            <h3>Best Support</h3>
+            <p>Quick help on WhatsApp & LINE.</p>
+          </div>
+          <div class="card">
+            <h3>Easy Top Up</h3>
+            <p>Top up anytime with a simple order flow.</p>
+          </div>
+        </div>
+
+        <div class="note push-bottom" style="margin-top:14px;">
+          Need help now? Use the floating buttons (WhatsApp / LINE) at the bottom-right.
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Floating buttons -->
+  <div class="float" aria-hidden="false">
+    <a class="li" href="https://line.me/ti/p/oL-RT-PVJX" target="_blank" aria-label="Chat on LINE">LINE</a>
+    <a class="wa" href="https://wa.me/972512965990?text=Hello%20AllNetworks%2C%20I%20want%20to%20top%20up%20or%20order%20a%20SIM%2FeSIM" target="_blank" aria-label="Chat on WhatsApp">WA</a>
+  </div>
+
+  <footer>
+    © 2025 AllNetworks. All rights reserved.
+    <div class="footer-links">
+      <a href="terms.html" target="_blank">Terms and Conditions</a>
+      <a href="about-allnetworks-english.html">About Us</a>
+    </div>
+    <div class="footer-small">Prices and availability may change. Final confirmation is done on WhatsApp/LINE.</div>
+  </footer>
+
+  <script>
+    // --- ONLINE PAYMENT LINKS (replace with your real links) ---
+    // Stripe: create a Stripe Payment Link and paste it here
+    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/REPLACE_ME";
+    // PayPal: use paypal.me link or a hosted checkout link
+    const PAYPAL_PAYMENT_LINK = "https://www.paypal.me/REPLACE_ME";
+
+    // --- COUPON SYSTEM CONFIGURATION ---
+    // Option 1: Google Sheets (make sure sheet is public/anyone with link can view)
+    // Format: https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:csv&sheet=Sheet1
+    // Replace YOUR_SHEET_ID with your actual Google Sheet ID
+    const COUPON_SOURCE = "google_sheets"; // or "csv_url"
+    const GOOGLE_SHEET_ID = "1xyaI1cKuz6ior1EK04SOWMx7HbngejCr7nfLP8E9A8c"; // Your Google Sheet ID
+    const GOOGLE_SHEET_NAME = "Sheet1"; // Name of the sheet/tab (default: "Sheet1" or first sheet)
+    
+    // Phone prices Google Sheet configuration
+    const PHONE_PRICES_SHEET_ID = "17Qmxs_-M6Uoych6XiE9QUJvKbJUrryU98PU845tf-MY"; // Phone prices sheet ID
+    const PHONE_PRICES_SHEET_NAME = "phone_prices"; // Name of the sheet/tab
+    // Option 2: Direct CSV/Excel file URL (must be publicly accessible)
+    const CSV_URL = "https://your-domain.com/coupons.csv"; // Replace with your CSV file URL
+    
+    // Coupon cache
+    let couponData = null;
+    let appliedCoupon = null;
+    
+    // Phone prices cache
+    let phonePricesData = null;
+    let currentPhonePrice = null; // Price for the currently entered phone number
+
+    // --- TWILIO PHONE VERIFICATION CONFIGURATION ---
+    // IMPORTANT: Never put Twilio credentials in client-side code!
+    // Backend is deployed on Vercel
+    const TWILIO_BACKEND_URL = "https://verification-server-livid.vercel.app/api";
+    
+    // Debug: Log the backend URL (check browser console)
+    console.log('Twilio Backend URL:', TWILIO_BACKEND_URL);
+    
+    // Phone verification state
+    let phoneVerified = false;
+    let verificationSid = null;
+
+    // --- Fetch coupons from Google Sheets or CSV ---
+    async function fetchCoupons() {
+      if (couponData) return couponData; // Use cache if available
+
+      try {
+        let csvText;
+        
+        if (COUPON_SOURCE === "google_sheets") {
+          // Google Sheets CSV export URL
+          const sheetUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(GOOGLE_SHEET_NAME)}`;
+          
+          // Detect if running from file:// protocol (local file) - always use proxy
+          const isLocalFile = window.location.protocol === 'file:';
+          
+          // Helper function to decode base64 data URL
+          function decodeDataUrl(dataUrl) {
+            if (!dataUrl) return '';
+            
+            // Check if it's a data URL
+            if (dataUrl.startsWith('data:')) {
+              // Extract base64 part after "base64,"
+              const base64Index = dataUrl.indexOf('base64,');
+              if (base64Index !== -1) {
+                const base64String = dataUrl.substring(base64Index + 7); // +7 for "base64,"
+                try {
+                  // Decode base64 to text
+                  return atob(base64String);
+                } catch (e) {
+                  console.error('Error decoding base64:', e);
+                  return dataUrl; // Fallback to original
+                }
+              }
+            }
+            // Not a data URL, return as-is (might be plain text)
+            return dataUrl;
+          }
+
+          // Try multiple CORS proxy services as fallback
+          const proxyServices = [
+            { url: `https://api.allorigins.win/get?url=${encodeURIComponent(sheetUrl)}`, type: 'allorigins' },
+            { url: `https://corsproxy.io/?${encodeURIComponent(sheetUrl)}`, type: 'corsproxy' },
+            { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(sheetUrl)}`, type: 'codetabs' }
+          ];
+
+          let lastError = null;
+          
+          let fetched = false;
+          
+          // Try direct fetch first (works if hosted on a web server)
+          if (!isLocalFile) {
+            try {
+              const directResponse = await fetch(sheetUrl);
+              if (directResponse.ok) {
+                const text = await directResponse.text();
+                if (text && text.trim()) {
+                  csvText = text;
+                  fetched = true;
+                }
+              }
+            } catch (directError) {
+              console.log('Direct fetch failed, trying CORS proxies...');
+            }
+          }
+
+          // Try each proxy service if direct fetch didn't work
+          if (!fetched) {
+            for (const proxy of proxyServices) {
+              try {
+                console.log('Trying proxy:', proxy.type);
+                const proxyResponse = await fetch(proxy.url, {
+                  method: 'GET',
+                  headers: {
+                    'Accept': 'application/json'
+                  }
+                });
+                
+                if (!proxyResponse.ok) {
+                  throw new Error(`Proxy returned ${proxyResponse.status}`);
+                }
+                
+                const proxyData = await proxyResponse.json();
+                
+                // Handle different proxy response formats
+                if (proxy.type === 'allorigins' && proxyData.contents) {
+                  // AllOrigins format
+                  csvText = decodeDataUrl(proxyData.contents);
+                } else if (proxyData.data) {
+                  // Some proxies return data field
+                  csvText = typeof proxyData.data === 'string' ? proxyData.data : JSON.stringify(proxyData.data);
+                } else if (typeof proxyData === 'string') {
+                  // Direct CSV text
+                  csvText = proxyData;
+                } else {
+                  // Try to extract CSV from response
+                  csvText = JSON.stringify(proxyData);
+                }
+                
+                if (csvText && csvText.trim() && csvText.includes('code')) {
+                  console.log('Successfully fetched coupons via', proxy.type);
+                  fetched = true;
+                  break; // Success, exit loop
+                } else {
+                  throw new Error('Invalid CSV data received');
+                }
+              } catch (proxyError) {
+                console.warn('Proxy', proxy.type, 'failed:', proxyError.message);
+                lastError = proxyError;
+                continue; // Try next proxy
+              }
+            }
+          }
+          
+          // If all methods failed, throw error
+          if (!fetched || !csvText) {
+            throw new Error(`Failed to fetch coupons. All methods failed. Last error: ${lastError?.message || 'Unknown error'}`);
+          }
+        } else {
+          const response = await fetch(CSV_URL);
+          csvText = await response.text();
+        }
+        
+        // Parse CSV with proper handling of quoted fields
+        // Expected format: CODE,DISCOUNT,TYPE,DESCRIPTION
+        // Example: SUMMER20,20,percent,Summer 20% off
+        //          FIXED10,10,fixed,10 NIS discount
+        const lines = csvText.split('\n').filter(line => line.trim());
+        
+        couponData = [];
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue; // Skip empty lines
+          
+          // Parse CSV line handling quoted fields properly
+          const values = [];
+          let current = '';
+          let inQuotes = false;
+          
+          for (let j = 0; j < line.length; j++) {
+            const char = line[j];
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              // Remove surrounding quotes and trim
+              values.push(current.trim().replace(/^"|"$/g, ''));
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          // Add the last value
+          values.push(current.trim().replace(/^"|"$/g, ''));
+          
+          if (values[0]) { // Skip empty rows
+            couponData.push({
+              code: values[0].toUpperCase(),
+              discount: parseFloat(values[1]) || 0,
+              type: (values[2] || 'percent').toLowerCase(), // 'percent' or 'fixed'
+              description: values[3] || ''
+            });
+          }
+        }
+        
+        return couponData;
+      } catch (error) {
+        console.error('Error fetching coupons:', error);
+        return [];
+      }
+    }
+
+    // --- Validate and apply coupon ---
+    async function validateCoupon(code) {
+      if (!code) return null;
+      
+      const coupons = await fetchCoupons();
+      const coupon = coupons.find(c => c.code === code.toUpperCase().trim());
+      
+      return coupon || null;
+    }
+
+    // --- Fetch phone prices from Google Sheets ---
+    async function fetchPhonePrices() {
+      if (phonePricesData) return phonePricesData; // Use cache if available
+
+      try {
+        let csvText;
+        const sheetUrl = `https://docs.google.com/spreadsheets/d/${PHONE_PRICES_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(PHONE_PRICES_SHEET_NAME)}`;
+        
+        // Detect if running from file:// protocol (local file) - always use proxy
+        const isLocalFile = window.location.protocol === 'file:';
+        
+        // Helper function to decode base64 data URL
+        function decodeDataUrl(dataUrl) {
+          if (!dataUrl) return '';
+          
+          // Check if it's a data URL
+          if (dataUrl.startsWith('data:')) {
+            // Extract base64 part after "base64,"
+            const base64Index = dataUrl.indexOf('base64,');
+            if (base64Index !== -1) {
+              const base64String = dataUrl.substring(base64Index + 7); // +7 for "base64,"
+              try {
+                // Decode base64 to text
+                return atob(base64String);
+              } catch (e) {
+                console.error('Error decoding base64:', e);
+                return dataUrl; // Fallback to original
+              }
+            }
+          }
+          // Not a data URL, return as-is (might be plain text)
+          return dataUrl;
+        }
+
+        // Try multiple CORS proxy services as fallback
+        const proxyServices = [
+          { url: `https://api.allorigins.win/get?url=${encodeURIComponent(sheetUrl)}`, type: 'allorigins' },
+          { url: `https://corsproxy.io/?${encodeURIComponent(sheetUrl)}`, type: 'corsproxy' },
+          { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(sheetUrl)}`, type: 'codetabs' }
+        ];
+
+        let lastError = null;
+        let fetched = false;
+        
+        // Try direct fetch first (works if hosted on a web server)
+        if (!isLocalFile) {
+          try {
+            const directResponse = await fetch(sheetUrl);
+            if (directResponse.ok) {
+              const text = await directResponse.text();
+              if (text && text.trim()) {
+                csvText = text;
+                fetched = true;
+              }
+            }
+          } catch (directError) {
+            console.log('Direct fetch failed for phone prices, trying CORS proxies...');
+          }
+        }
+
+        // Try each proxy service if direct fetch didn't work
+        if (!fetched) {
+          for (const proxy of proxyServices) {
+            try {
+              console.log('Trying proxy for phone prices:', proxy.type);
+              const proxyResponse = await fetch(proxy.url, {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json'
+                }
+              });
+              
+              if (!proxyResponse.ok) {
+                throw new Error(`Proxy returned ${proxyResponse.status}`);
+              }
+              
+              const proxyData = await proxyResponse.json();
+              
+              // Handle different proxy response formats
+              if (proxy.type === 'allorigins' && proxyData.contents) {
+                // AllOrigins format
+                csvText = decodeDataUrl(proxyData.contents);
+              } else if (proxyData.data) {
+                // Some proxies return data field
+                csvText = typeof proxyData.data === 'string' ? proxyData.data : JSON.stringify(proxyData.data);
+              } else if (typeof proxyData === 'string') {
+                // Direct CSV text
+                csvText = proxyData;
+              } else {
+                // Try to extract CSV from response
+                csvText = JSON.stringify(proxyData);
+              }
+              
+              if (csvText && csvText.trim()) {
+                console.log('Successfully fetched phone prices via', proxy.type);
+                fetched = true;
+                break; // Success, exit loop
+              } else {
+                throw new Error('Invalid CSV data received');
+              }
+            } catch (proxyError) {
+              console.warn('Proxy', proxy.type, 'failed for phone prices:', proxyError.message);
+              lastError = proxyError;
+              continue; // Try next proxy
+            }
+          }
+        }
+        
+        // If all methods failed, throw error
+        if (!fetched || !csvText) {
+          throw new Error(`Failed to fetch phone prices. All methods failed. Last error: ${lastError?.message || 'Unknown error'}`);
+        }
+        
+        // Parse CSV - Expected format: PHONE_NUMBER,PRICE
+        // Example: 0543456305,40
+        const lines = csvText.split('\n').filter(line => line.trim());
+        phonePricesData = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line.trim()) continue;
+          
+          // Parse CSV with proper handling of quoted fields
+          let values = [];
+          let current = '';
+          let inQuotes = false;
+          
+          for (let j = 0; j < line.length; j++) {
+            const char = line[j];
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              // Remove surrounding quotes and trim
+              values.push(current.trim().replace(/^"|"$/g, ''));
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          // Add the last value
+          values.push(current.trim().replace(/^"|"$/g, ''));
+          
+          if (values[0] && values[1]) { // Skip empty rows
+            // Normalize phone number (remove dashes, spaces, etc.)
+            const phoneNumber = values[0].replace(/[\s\-\(\)]/g, '');
+            const price = parseFloat(values[1]) || 0;
+            
+            if (phoneNumber && price > 0) {
+              phonePricesData.push({
+                phone: phoneNumber,
+                price: price
+              });
+            }
+          }
+        }
+        
+        return phonePricesData;
+      } catch (error) {
+        console.error('Error fetching phone prices:', error);
+        return [];
+      }
+    }
+
+    // --- Lookup price by phone number from Excel sheet ---
+    // This function looks up the price for a phone number from the Excel sheet
+    // IMPORTANT: This should be called with the Step 1 "existingNumber" field, NOT the Step 3 verification number
+    async function lookupPhonePrice(phoneNumber) {
+      if (!phoneNumber) {
+        currentPhonePrice = null;
+        return null;
+      }
+      
+      // Normalize phone number (remove dashes, spaces, etc.)
+      const normalized = phoneNumber.replace(/[\s\-\(\)]/g, '');
+      
+      if (!normalized || normalized.length < 9) {
+        currentPhonePrice = null;
+        console.log(`Phone number too short: ${normalized}`);
+        return null;
+      }
+      
+      // Fetch prices from Excel sheet
+      const prices = await fetchPhonePrices();
+      
+      // Find exact match for this phone number
+      const match = prices.find(p => p.phone === normalized);
+      
+      if (match) {
+        currentPhonePrice = match.price;
+        console.log(`✓ Found price in Excel for ${normalized}: ${match.price} ILS`);
+        return match.price;
+      } else {
+        currentPhonePrice = null;
+        console.log(`✗ No price found in Excel for phone number: ${normalized}`);
+        console.log(`Available phone numbers in Excel:`, prices.map(p => p.phone).slice(0, 5));
+        return null;
+      }
+    }
+
+    // --- Wizard logic ---
+    const form = document.getElementById('orderForm');
+    const steps = Array.from(document.querySelectorAll('.step'));
+    const chips = Array.from(document.querySelectorAll('.step-chip'));
+    const nextBtn = document.getElementById('nextBtn');
+    const backBtn = document.getElementById('backBtn');
+    const sendWhatsAppBtn = document.getElementById('sendWhatsApp');
+
+    const simTypeRadios = form.elements['simType'];
+
+// --- Toggle fields based on order type ---
+    const orderTypeRadios = form.elements['orderType'];
+    const existingNumberInput = document.getElementById('existingNumberInput');
+    const quantityInput = document.getElementById('quantityInput');
+    const packageLabelWrap = document.getElementById('packageLabelWrap');
+    const quantityLabelWrap = document.getElementById('quantityLabelWrap');
+    const existingNumberLabelWrap = document.getElementById('existingNumberLabelWrap');
+    const packageSelect = document.getElementById('packageSelect');
+
+    function toggleOrderTypeFields() {
+      const val = valueOf('orderType');
+      const isTopUp = val === 'Top up existing SIM';
+      const isNewNumber = val === 'New mobile number';
+      
+      // Toggle quantity field - show for "New mobile number"
+      if (quantityLabelWrap) {
+        quantityLabelWrap.classList.toggle('hidden', !isNewNumber);
+      }
+      if (quantityInput) {
+        if (isNewNumber && !quantityInput.value) {
+          quantityInput.value = '1';
+        }
+      }
+      
+      // Toggle existing number field - show for "Top up existing SIM"
+      if (existingNumberLabelWrap) {
+        existingNumberLabelWrap.classList.toggle('hidden', !isTopUp);
+      }
+      if (existingNumberInput) {
+        if (isTopUp) {
+          existingNumberInput.disabled = false;
+          existingNumberInput.placeholder = 'e.g. 05X-XXXXXXX';
+        } else {
+          existingNumberInput.value = '';
+          existingNumberInput.disabled = true;
+        }
+      }
+      
+      // Toggle package field - hide for "Top up existing SIM"
+      if (packageLabelWrap) {
+        packageLabelWrap.classList.toggle('hidden', isTopUp);
+      }
+      if (packageSelect) {
+        if (isTopUp) {
+          packageSelect.removeAttribute('required');
+          packageSelect.value = '';
+        } else {
+          packageSelect.setAttribute('required', 'required');
+        }
+      }
+    }
+
+    if (orderTypeRadios) {
+      Array.from(orderTypeRadios).forEach(r =>
+        r.addEventListener('change', toggleOrderTypeFields)
+      );
+    }
+    
+    // Initialize on page load
+    toggleOrderTypeFields();
+    
+    // --- Phone number price lookup ---
+    // When user enters a phone number for "Top up existing SIM", look up the price
+    if (existingNumberInput) {
+      existingNumberInput.addEventListener('input', async function() {
+        const orderType = valueOf('orderType');
+        if (orderType === 'Top up existing SIM' && this.value.trim()) {
+          const price = await lookupPhonePrice(this.value);
+          // Update summary if we're on step 4
+          if (current === 4) {
+            updateSummary();
+          }
+        } else {
+          currentPhonePrice = null;
+          if (current === 4) {
+            updateSummary();
+          }
+        }
+      });
+      
+      // Also trigger lookup when order type changes to "Top up existing SIM"
+      if (orderTypeRadios) {
+        Array.from(orderTypeRadios).forEach(r =>
+          r.addEventListener('change', async function() {
+            if (this.value === 'Top up existing SIM' && existingNumberInput.value.trim()) {
+              await lookupPhonePrice(existingNumberInput.value);
+              if (current === 4) {
+                updateSummary();
+              }
+            } else {
+              currentPhonePrice = null;
+              if (current === 4) {
+                updateSummary();
+              }
+            }
+          })
+        );
+      }
+    }
+    
+    // --- Quantity change handler ---
+    // Update summary when quantity changes
+    if (quantityInput) {
+      quantityInput.addEventListener('change', function() {
+        // Update summary when quantity changes
+        updateSummary();
+      });
+    }
+
+    // --- Phone Verification Functions ---
+    const sendOTPBtn = document.getElementById('sendOTPBtn');
+    const verifyOTPBtn = document.getElementById('verifyOTPBtn');
+    const resendOTPBtn = document.getElementById('resendOTPBtn');
+    const verificationStep1 = document.getElementById('verificationStep1');
+    const verificationStep2 = document.getElementById('verificationStep2');
+    const otpCodeInput = document.getElementById('otpCode');
+    const otpHint = document.getElementById('otpHint');
+    const verificationStatus = document.getElementById('verificationStatus');
+    const mobileInput = document.getElementById('mobileInput');
+
+    // Update verification status UI
+    function updateVerificationStatus(verified) {
+      phoneVerified = verified;
+      if (verificationStatus) {
+        if (verified) {
+          verificationStatus.textContent = '✓ Verified';
+          verificationStatus.style.background = 'var(--ok)';
+        } else {
+          verificationStatus.textContent = 'Not verified';
+          verificationStatus.style.background = 'var(--muted)';
+        }
+      }
+    }
+
+    // Send OTP code
+    async function sendOTP() {
+      // Get phone number from Step 3 form fields
+      const countryCode = valueOf('countryCode').trim();
+      const mobile = valueOf('mobile').trim();
+      
+      if (!countryCode || !mobile) {
+        alert('Please enter country code and mobile number in Step 3 first.');
+        return;
+      }
+
+      // Format phone number for Twilio (E.164 format: +[country code][number] with no spaces)
+      // Ensure country code starts with +
+      let normCC = countryCode.trim();
+      if (!normCC.startsWith('+')) {
+        normCC = '+' + normCC.replace(/[^0-9]/g, '');
+      } else {
+        normCC = '+' + normCC.substring(1).replace(/[^0-9]/g, '');
+      }
+      // Remove all spaces and non-digits from mobile number
+      const normMob = mobile.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+      
+      // Combine: +countrycode+number (no space)
+      const fullNumber = normCC + normMob;
+      
+      console.log('Phone number formatted for Twilio:', fullNumber);
+      
+      sendOTPBtn.disabled = true;
+      sendOTPBtn.textContent = 'Sending...';
+      otpHint.textContent = '';
+      otpHint.style.color = 'var(--muted)';
+
+      try {
+        // Call your backend endpoint to send OTP via Twilio
+        const url = `${TWILIO_BACKEND_URL}/send-otp`;
+        console.log('Calling:', url);
+        
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ phoneNumber: fullNumber })
+        });
+
+        console.log('Response status:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          console.error('Response error:', response.status, await response.text());
+        }
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          verificationSid = data.verificationSid;
+          verificationStep1.classList.add('hidden');
+          verificationStep2.classList.remove('hidden');
+          otpCodeInput.focus();
+          otpHint.textContent = 'Verification code sent! Check your phone.';
+          otpHint.style.color = 'var(--ok)';
+        } else {
+          throw new Error(data.error || 'Failed to send OTP');
+        }
+      } catch (error) {
+        console.error('Error sending OTP:', error);
+        console.error('Backend URL used:', TWILIO_BACKEND_URL);
+        otpHint.textContent = `Error: ${error.message}. Check console for details. Backend URL: ${TWILIO_BACKEND_URL}`;
+        otpHint.style.color = '#ef4444';
+        sendOTPBtn.disabled = false;
+        sendOTPBtn.textContent = 'Send Verification Code';
+      }
+    }
+
+    // Verify OTP code
+    async function verifyOTP() {
+      const code = otpCodeInput.value.trim();
+      
+      if (!code || code.length !== 6) {
+        otpHint.textContent = 'Please enter a valid 6-digit code.';
+        otpHint.style.color = '#ef4444';
+        return;
+      }
+
+      verifyOTPBtn.disabled = true;
+      verifyOTPBtn.textContent = 'Verifying...';
+      otpHint.textContent = '';
+
+      try {
+        // Get phone number from Step 3 form fields (same format as sendOTP)
+        const countryCode = valueOf('countryCode').trim();
+        const mobile = valueOf('mobile').trim();
+        
+        if (!countryCode || !mobile) {
+          throw new Error('Phone number not found. Please enter country code and mobile number.');
+        }
+
+        // Format phone number for Twilio (E.164 format: +[country code][number] with no spaces)
+        let normCC = countryCode.trim();
+        if (!normCC.startsWith('+')) {
+          normCC = '+' + normCC.replace(/[^0-9]/g, '');
+        } else {
+          normCC = '+' + normCC.substring(1).replace(/[^0-9]/g, '');
+        }
+        const normMob = mobile.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+        const fullNumber = normCC + normMob;
+        
+        console.log('Verifying phone number:', fullNumber);
+
+        // Call your backend endpoint to verify OTP
+        const response = await fetch(`${TWILIO_BACKEND_URL}/verify-otp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            phoneNumber: fullNumber,
+            code: code,
+            verificationSid: verificationSid
+          })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          updateVerificationStatus(true);
+          verificationStep2.classList.add('hidden');
+          otpHint.textContent = '✓ Phone number verified successfully!';
+          otpHint.style.color = 'var(--ok)';
+          mobileInput.style.borderColor = 'var(--ok)';
+        } else {
+          throw new Error(data.error || 'Invalid verification code');
+        }
+      } catch (error) {
+        console.error('Error verifying OTP:', error);
+        otpHint.textContent = `Error: ${error.message}`;
+        otpHint.style.color = '#ef4444';
+        verifyOTPBtn.disabled = false;
+        verifyOTPBtn.textContent = 'Verify';
+      }
+    }
+
+    // Resend OTP
+    async function resendOTP() {
+      verificationSid = null;
+      otpCodeInput.value = '';
+      otpHint.textContent = '';
+      await sendOTP();
+    }
+
+    // Event listeners
+    sendOTPBtn?.addEventListener('click', sendOTP);
+    verifyOTPBtn?.addEventListener('click', verifyOTP);
+    resendOTPBtn?.addEventListener('click', resendOTP);
+
+    // Allow Enter key to verify OTP
+    otpCodeInput?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        verifyOTP();
+      }
+    });
+
+    // Initialize verification status
+    updateVerificationStatus(false);
+    
+    // Disable send button initially until phone number is entered
+    if (sendOTPBtn) {
+      sendOTPBtn.disabled = true;
+    }
+
+    // Function to update phone number display and enable/disable send button
+    function updatePhoneNumberDisplay() {
+      const phoneNumberDisplay = document.getElementById('phoneNumberDisplay');
+      if (!phoneNumberDisplay) return;
+      
+      const countryCode = valueOf('countryCode').trim();
+      const mobile = valueOf('mobile').trim();
+      
+      if (countryCode && mobile) {
+        // Format for display (with space)
+        let normCC = countryCode.trim();
+        if (!normCC.startsWith('+')) {
+          normCC = '+' + normCC.replace(/[^0-9]/g, '');
+        }
+        phoneNumberDisplay.textContent = `Verifying: ${normCC} ${mobile}`;
+        phoneNumberDisplay.style.color = 'var(--text)';
+        phoneNumberDisplay.style.display = 'block';
+        
+        // Enable send button if not already verified
+        if (sendOTPBtn && !phoneVerified) {
+          sendOTPBtn.disabled = false;
+        }
+      } else {
+        phoneNumberDisplay.textContent = 'Enter country code and mobile number above first';
+        phoneNumberDisplay.style.color = 'var(--muted)';
+        
+        // Disable send button if phone number not complete
+        if (sendOTPBtn && !phoneVerified) {
+          sendOTPBtn.disabled = true;
+        }
+      }
+    }
+
+    // Update phone number display when fields change
+    const countryCodeInput = form.elements['countryCode'];
+    const mobileInputField = form.elements['mobile'];
+    
+    if (countryCodeInput) {
+      countryCodeInput.addEventListener('input', updatePhoneNumberDisplay);
+      countryCodeInput.addEventListener('change', updatePhoneNumberDisplay);
+    }
+    if (mobileInputField) {
+      mobileInputField.addEventListener('input', updatePhoneNumberDisplay);
+      mobileInputField.addEventListener('change', updatePhoneNumberDisplay);
+    }
+    
+    // Initial update
+    updatePhoneNumberDisplay();
+
+    // --- Show Delivery Address only for: New mobile number + Physical SIM ---
+    const addressWrap = document.getElementById('addressWrap');
+    const emailWrap = document.getElementById('emailWrap');
+
+    function needsDeliveryAddress(){
+      return valueOf('orderType') === 'New mobile number' && valueOf('simType') === 'Physical SIM';
+    }
+
+    function toggleDeliveryAddress(){
+      const need = needsDeliveryAddress();
+
+      if(addressWrap){
+        addressWrap.classList.toggle('hidden', !need);
+      }
+
+      // Email: optional, and hidden when delivery address is required (per your rule)
+      if(emailWrap){
+        emailWrap.style.display = need ? 'none' : 'block';
+        if(need){
+          // clear email if hidden
+          const emailInput = form.elements['email'];
+          if(emailInput) emailInput.value = '';
+        }
+      }
+
+      // Address required attributes
+      const fields = ['addrCountry','addrCity','addrStreet','addrZip'];
+      fields.forEach(name => {
+        const el = form.elements[name];
+        if(!el) return;
+        if(need){
+          el.setAttribute('required', 'required');
+        }else{
+          el.removeAttribute('required');
+          el.value = '';
+        }
+      });
+    }
+
+    // Hook address toggling to changes
+    if (orderTypeRadios) {
+      Array.from(orderTypeRadios).forEach(r =>
+        r.addEventListener('change', toggleDeliveryAddress)
+      );
+    }
+    if (simTypeRadios) {
+      Array.from(simTypeRadios).forEach(r =>
+        r.addEventListener('change', toggleDeliveryAddress)
+      );
+    }
+    const submitHint = document.getElementById('submitHint');
+
+    let current = 1;
+
+    // Initial conditional field setup
+    toggleDeliveryAddress();
+
+    function setStep(n){
+      current = n;
+      steps.forEach(s => s.classList.toggle('hidden', Number(s.dataset.step) !== current));
+
+
+      // Update conditional fields when step changes
+      toggleDeliveryAddress();
+      chips.forEach(c => {
+        const stepN = Number(c.dataset.step);
+        c.classList.toggle('active', stepN === current);
+        c.classList.toggle('done', stepN < current);
+      });
+
+      backBtn.disabled = current === 1;
+      nextBtn.classList.toggle('hidden', current === 4);
+    }
+
+    function valueOf(name){
+      const el = form.elements[name];
+      if(!el) return '';
+      if(el instanceof RadioNodeList){
+        return el.value || '';
+      }
+      return el.value || '';
+    }
+
+    function fullMobile(){
+      const cc = (valueOf('countryCode') || '').trim();
+      const mob = (valueOf('mobile') || '').trim();
+      if(!cc && !mob) return '';
+      // normalize: ensure country code starts with +
+      const normCC = cc.startsWith('+') ? cc : ('+' + cc.replace(/[^0-9]/g,''));
+      const normMob = mob.replace(/\s+/g,'');
+      return (normCC + ' ' + normMob).trim();
+    }
+
+    function chosenNumber(){
+      const manual = valueOf('manualNumber').trim();
+      if(manual) return manual;
+      return valueOf('chosenNumber');
+    }
+
+    async function updateSummary(){
+      const orderType = valueOf('orderType');
+      const pack = valueOf('package');
+      const simType = valueOf('simType');
+      
+      // For "Top up existing SIM", use Step 1 phone number; otherwise use Step 3 verification number
+      let num;
+      if (orderType === 'Top up existing SIM') {
+        const existingNumber = valueOf('existingNumber');
+        if (existingNumber && existingNumber.trim()) {
+          // Format the Step 1 phone number for display (add +972 if it starts with 0)
+          let formatted = existingNumber.trim();
+          if (formatted.startsWith('0')) {
+            formatted = '+972 ' + formatted.substring(1);
+          } else if (!formatted.startsWith('+')) {
+            formatted = '+972 ' + formatted;
+          }
+          num = formatted;
+        } else {
+          num = '—';
+        }
+      } else {
+        num = fullMobile() || '—';
+      }
+      
+      const name = [valueOf('firstName'), valueOf('lastName')].filter(Boolean).join(' ');
+      const email = valueOf('email');
+      const pay = valueOf('payment');
+
+      document.getElementById('sOrder').textContent = orderType || '—';
+      document.getElementById('sPack').textContent = pack || '—';
+      document.getElementById('sSim').textContent = simType || '—';
+      document.getElementById('sNum').textContent = num || '—';
+      document.getElementById('sName').textContent = name || '—';
+      document.getElementById('sEmail').textContent = email || '—';
+
+      const emailRow = document.getElementById('emailSummaryRow');
+      if(emailRow){
+        emailRow.classList.toggle('hidden', needsDeliveryAddress());
+      }
+
+      const addr = [valueOf('addrCountry'), valueOf('addrCity'), valueOf('addrStreet'), valueOf('addrZip')].filter(Boolean).join(', ');
+
+      const addrRow = document.getElementById('addrSummaryRow');
+      const addrSpan = document.getElementById('sAddr');
+      if(addrRow && addrSpan){
+        const needAddr = needsDeliveryAddress();
+        addrRow.classList.toggle('hidden', !needAddr);
+        addrSpan.textContent = (needAddr ? (addr || '—') : '—');
+      }
+      
+      // Coupon summary
+      const couponRow = document.getElementById('couponSummaryRow');
+      const discountRow = document.getElementById('discountSummaryRow');
+      if (appliedCoupon) {
+        if (couponRow) {
+          couponRow.classList.remove('hidden');
+          document.getElementById('sCoupon').textContent = appliedCoupon.code;
+        }
+        if (discountRow) {
+          discountRow.classList.remove('hidden');
+          const discountText = appliedCoupon.type === 'percent' 
+            ? `${appliedCoupon.discount}% off`
+            : `${appliedCoupon.discount} NIS off`;
+          document.getElementById('sDiscount').textContent = discountText;
+        }
+      } else {
+        if (couponRow) couponRow.classList.add('hidden');
+        if (discountRow) discountRow.classList.add('hidden');
+      }
+      
+      // Shipping fee for Physical SIM
+      const shippingRow = document.getElementById('shippingSummaryRow');
+      const isPhysicalSIM = simType === 'Physical SIM';
+      if (shippingRow) {
+        shippingRow.classList.toggle('hidden', !isPhysicalSIM);
+      }
+      
+      // Price calculation
+      let packagePrice = 0;
+      const packagePriceRow = document.getElementById('packagePriceRow');
+      const subtotalPriceRow = document.getElementById('subtotalPriceRow');
+      const totalPriceRow = document.getElementById('totalPriceRow');
+      
+      // Get quantity (default to 1)
+      const quantity = parseInt(valueOf('quantity')) || 1;
+      
+      // For "Top up existing SIM", always use price from phone lookup (Step 1 phone number)
+      if (orderType === 'Top up existing SIM') {
+        // Get phone number from Step 1 (existingNumber field), NOT from Step 3 verification
+        const existingNumber = valueOf('existingNumber');
+        if (existingNumber && existingNumber.trim()) {
+          // Always do a fresh lookup to ensure we have the latest price from Excel
+          // This ensures we use the Step 1 number, not the verification number
+          const lookedUpPrice = await lookupPhonePrice(existingNumber);
+          packagePrice = lookedUpPrice || 0;
+        } else {
+          packagePrice = 0; // No phone number entered yet in Step 1
+        }
+      } else if (pack && pack !== 'Custom top up (agent will confirm)') {
+        // Extract price from package string (e.g., "45 NIS / month" -> 45)
+        const priceMatch = pack.match(/(\d+)\s*NIS/);
+        if (priceMatch) {
+          packagePrice = parseFloat(priceMatch[1]);
+        }
+      }
+      
+      // Multiply package price by quantity for "New mobile number"
+      if (orderType === 'New mobile number') {
+        packagePrice = packagePrice * quantity;
+      }
+      
+      const shippingFee = isPhysicalSIM ? 40 * quantity : 0; // Shipping fee per item
+      let subtotal = packagePrice + shippingFee;
+      
+      // Apply discount if coupon exists
+      let discountAmount = 0;
+      if (appliedCoupon) {
+        if (appliedCoupon.type === 'percent') {
+          discountAmount = (subtotal * appliedCoupon.discount) / 100;
+        } else {
+          discountAmount = appliedCoupon.discount;
+        }
+      }
+      
+      const total = Math.max(0, subtotal - discountAmount);
+      
+      // Always display prices
+      if (packagePriceRow) {
+        packagePriceRow.classList.remove('hidden');
+        if (packagePrice > 0) {
+          const unitPrice = orderType === 'Top up existing SIM' 
+            ? packagePrice 
+            : (packagePrice / quantity);
+          if (orderType === 'New mobile number' && quantity > 1) {
+            document.getElementById('sPackagePrice').textContent = `${unitPrice.toFixed(2)} ILS × ${quantity} = ${packagePrice} ILS`;
+          } else {
+            document.getElementById('sPackagePrice').textContent = `${packagePrice} ILS`;
+          }
+        } else {
+          document.getElementById('sPackagePrice').textContent = 'Calculating...';
+        }
+      }
+      
+      if (subtotalPriceRow) {
+        subtotalPriceRow.classList.remove('hidden');
+        document.getElementById('sSubtotal').textContent = `${subtotal.toFixed(2)} ILS`;
+      }
+      
+      // Always show total
+      if (totalPriceRow) {
+        totalPriceRow.classList.remove('hidden');
+        document.getElementById('sTotal').textContent = `${total.toFixed(2)} ILS`;
+      }
+      
+      document.getElementById('sPay').textContent = pay || '—';
+    }
+
+    function validateStep(stepN){
+      // Minimal validation per step (friendly, not strict)
+      if(stepN === 1){
+        const orderType = valueOf('orderType');
+        if (!orderType) return false;
+        // Package is only required for "New mobile number", not for "Top up existing SIM"
+        if (orderType === 'New mobile number') {
+          return !!valueOf('package');
+        }
+        return true; // Top up existing SIM doesn't need package
+      }
+      if(stepN === 2){
+        return !!valueOf('simType');
+      }
+
+      if(stepN === 3){
+        const basicOk = !!valueOf('firstName') && !!valueOf('lastName') && !!valueOf('countryCode') && !!valueOf('mobile');
+        if(!basicOk) return false;
+        
+        // Require phone verification
+        if (!phoneVerified) {
+          alert('Please verify your phone number before continuing.');
+          return false;
+        }
+        
+        if(needsDeliveryAddress()){
+          return !!valueOf('addrCountry') && !!valueOf('addrCity') && !!valueOf('addrStreet') && !!valueOf('addrZip');
+        }
+        // If not delivery, email is optional (can be empty)
+        return true;
+      }
+      if(stepN === 4){
+        const paymentOk = !!valueOf('payment');
+        const termsAccepted = document.getElementById('acceptTerms')?.checked === true;
+        return paymentOk && termsAccepted;
+      }
+      return true;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if(!validateStep(current)){
+        alert('Please complete the required fields in this step.');
+        return;
+      }
+      setStep(Math.min(4, current + 1));
+      updateSummary();
+      window.scrollTo({ top: document.getElementById('topup').offsetTop - 10, behavior: 'smooth' });
+    });
+
+    backBtn.addEventListener('click', () => {
+      setStep(Math.max(1, current - 1));
+      updateSummary();
+      window.scrollTo({ top: document.getElementById('topup').offsetTop - 10, behavior: 'smooth' });
+    });
+
+    form.addEventListener('input', () => {
+      if(current === 4) updateSummary();
+    });
+
+    // --- Apply Coupon Button Handler ---
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const removeCouponBtn = document.getElementById('removeCouponBtn');
+    const couponCodeInput = document.getElementById('couponCode');
+    const couponHint = document.getElementById('couponHint');
+
+    // Function to update coupon UI state
+    function updateCouponUI() {
+      if (appliedCoupon) {
+        // Coupon is applied - show remove button, hide apply button
+        applyCouponBtn.classList.add('hidden');
+        removeCouponBtn.classList.remove('hidden');
+        couponCodeInput.value = appliedCoupon.code;
+        couponCodeInput.disabled = true;
+        couponCodeInput.style.borderColor = 'var(--ok)';
+        couponHint.textContent = `✓ Valid! ${appliedCoupon.type === 'percent' ? appliedCoupon.discount + '%' : appliedCoupon.discount + ' NIS'} discount applied. ${appliedCoupon.description || ''}`;
+        couponHint.style.color = 'var(--ok)';
+      } else {
+        // No coupon applied - show apply button, hide remove button
+        applyCouponBtn.classList.remove('hidden');
+        removeCouponBtn.classList.add('hidden');
+        couponCodeInput.disabled = false;
+        couponCodeInput.style.borderColor = '';
+        couponHint.textContent = 'Enter a coupon code to get a discount.';
+        couponHint.style.color = 'var(--muted)';
+      }
+    }
+
+    applyCouponBtn?.addEventListener('click', async () => {
+      const code = couponCodeInput.value.trim();
+      if (!code) {
+        couponHint.textContent = 'Please enter a coupon code.';
+        couponHint.style.color = 'var(--muted)';
+        return;
+      }
+
+      applyCouponBtn.disabled = true;
+      applyCouponBtn.textContent = 'Checking...';
+      couponHint.textContent = 'Validating coupon...';
+      couponHint.style.color = 'var(--muted)';
+
+      const coupon = await validateCoupon(code);
+      
+      if (coupon) {
+        appliedCoupon = coupon;
+        updateCouponUI();
+        updateSummary();
+      } else {
+        appliedCoupon = null;
+        couponCodeInput.style.borderColor = '#ef4444';
+        couponHint.textContent = '✗ Invalid coupon code. Please check and try again.';
+        couponHint.style.color = '#ef4444';
+        applyCouponBtn.textContent = 'Apply';
+        applyCouponBtn.disabled = false;
+        updateSummary();
+      }
+    });
+
+    // Remove Coupon Button Handler
+    removeCouponBtn?.addEventListener('click', () => {
+      appliedCoupon = null;
+      couponCodeInput.value = '';
+      couponCodeInput.disabled = false;
+      updateCouponUI();
+      updateSummary();
+    });
+
+    // Allow Enter key to apply coupon (only if not disabled)
+    couponCodeInput?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !couponCodeInput.disabled) {
+        e.preventDefault();
+        applyCouponBtn.click();
+      }
+    });
+
+    // Initialize coupon UI state
+    updateCouponUI();
+
+    // --- WhatsApp message builder ---
+    async function buildWhatsAppText(){
+      const orderType = valueOf('orderType');
+      const pack = valueOf('package');
+      const simType = valueOf('simType');
+      
+      // For "Top up existing SIM", use Step 1 phone number; otherwise use Step 3 verification number
+      let num;
+      if (orderType === 'Top up existing SIM') {
+        const existingNumber = valueOf('existingNumber');
+        if (existingNumber && existingNumber.trim()) {
+          // Format the Step 1 phone number for display (add +972 if it starts with 0)
+          let formatted = existingNumber.trim();
+          if (formatted.startsWith('0')) {
+            formatted = '+972 ' + formatted.substring(1);
+          } else if (!formatted.startsWith('+')) {
+            formatted = '+972 ' + formatted;
+          }
+          num = formatted;
+        } else {
+          num = '-';
+        }
+      } else {
+        num = fullMobile() || '-';
+      }
+      
+      const name = [valueOf('firstName'), valueOf('lastName')].filter(Boolean).join(' ');
+      const email = valueOf('email');
+      const pay = valueOf('payment');
+      
+      // Calculate price
+      let packagePrice = 0;
+      // Get quantity (default to 1)
+      const quantity = parseInt(valueOf('quantity')) || 1;
+      
+      // For "Top up existing SIM", use price from phone lookup (Step 1 phone number)
+      // Get phone number from Step 1 (existingNumber field), NOT from Step 3 verification
+      if (orderType === 'Top up existing SIM') {
+        const existingNumber = valueOf('existingNumber');
+        if (existingNumber && existingNumber.trim()) {
+          // Always do a fresh lookup to ensure we have the latest price from Excel
+          const lookedUpPrice = await lookupPhonePrice(existingNumber);
+          packagePrice = lookedUpPrice || 0;
+        } else {
+          packagePrice = 0; // No phone number entered yet in Step 1
+        }
+      } else if (pack && pack !== 'Custom top up (agent will confirm)') {
+        const priceMatch = pack.match(/(\d+)\s*NIS/);
+        if (priceMatch) {
+          packagePrice = parseFloat(priceMatch[1]);
+        }
+      }
+      
+      // Multiply package price by quantity for "New mobile number"
+      if (orderType === 'New mobile number') {
+        packagePrice = packagePrice * quantity;
+      }
+      
+      const shippingFee = simType === 'Physical SIM' ? 40 * quantity : 0; // Shipping fee per item
+      let subtotal = packagePrice + shippingFee;
+      let discountAmount = 0;
+      if (appliedCoupon) {
+        if (appliedCoupon.type === 'percent') {
+          discountAmount = (subtotal * appliedCoupon.discount) / 100;
+        } else {
+          discountAmount = appliedCoupon.discount;
+        }
+      }
+      const total = Math.max(0, subtotal - discountAmount);
+      
+      const parts = [
+        "Hello AllNetworks, I'd like to place an order/top-up:",
+        `• Order: ${orderType || '-'}`,
+        ...( orderType === 'New mobile number' && quantity > 1 ? [`• Quantity: ${quantity}`] : [] ),
+        `• Package: ${pack || '-'}`,
+        `• SIM Type: ${simType || '-'}`,
+        `• Number: ${num || '-'}`,
+        `• Full name: ${name || '-'}`,
+        ...( (!needsDeliveryAddress() && email) ? [`• Email: ${email}`] : [] ),
+        ...( appliedCoupon ? [`• Coupon: ${appliedCoupon.code} (${appliedCoupon.type === 'percent' ? appliedCoupon.discount + '%' : appliedCoupon.discount + ' NIS'} discount)`] : [] ),
+        ...( packagePrice > 0 ? [`• Package Price: ${packagePrice} ILS${orderType === 'New mobile number' && quantity > 1 ? ` (${(packagePrice / quantity).toFixed(2)} ILS × ${quantity})` : ''}`] : [] ),
+        ...( shippingFee > 0 ? [`• Shipping fee: ${shippingFee} ILS${quantity > 1 ? ` (${(shippingFee / quantity).toFixed(2)} ILS × ${quantity})` : ''}`] : [] ),
+        ...( total > 0 ? [`• Total: ${total.toFixed(2)} ILS`] : [] ),
+        `• Payment: ${pay || '-'}`,
+      ];      return encodeURIComponent(parts.join('\n'));
+    }
+
+    sendWhatsAppBtn?.addEventListener('click', () => {
+      // Ensure summary is up to date
+      updateSummary();
+
+      // Soft validation before sending
+      if(!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)){
+        alert('Please complete all steps before sending on WhatsApp.');
+        return;
+      }
+
+      const url = `https://wa.me/972512965990?text=${buildWhatsAppText()}`;
+      window.open(url, '_blank');
+    });
+
+    // --- Submit handler (no backend by default) ---
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      updateSummary();
+
+      if(!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)){
+        alert('Please complete all steps before submitting.');
+        return;
+      }
+
+      const pay = valueOf('payment');
+
+      // Basic success message
+      submitHint.textContent = "Order saved locally. If you chose an online payment method, you’ll be redirected now. Otherwise, send the order on WhatsApp to confirm.";
+      submitHint.style.color = "#0f5132";
+
+      // Redirect for online payments
+      if(pay === "Stripe (online)"){
+        if(STRIPE_PAYMENT_LINK.includes("REPLACE_ME")){
+          alert("Stripe link is not configured yet. Please replace STRIPE_PAYMENT_LINK in the code.");
+          return;
+        }
+        window.open(STRIPE_PAYMENT_LINK, "_blank");
+        return;
+      }
+
+      if(pay === "PayPal (online)"){
+        if(PAYPAL_PAYMENT_LINK.includes("REPLACE_ME")){
+          alert("PayPal link is not configured yet. Please replace PAYPAL_PAYMENT_LINK in the code.");
+          return;
+        }
+        window.open(PAYPAL_PAYMENT_LINK, "_blank");
+        return;
+      }
+    });
+
+    </script>
+</body>
+</html>
