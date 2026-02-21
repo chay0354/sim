@@ -361,6 +361,9 @@
 
     .hidden{ display:none !important; }
     .push-bottom{ margin-top: auto; }
+    .field-error{ display:block; font-size:12px; color:#dc2626; margin-top:4px; }
+    input.field-invalid, select.field-invalid{ border-color:#dc2626 !important; box-shadow:0 0 0 2px rgba(220,38,38,0.15); }
+    .step1-radio-error .radio-card{ border-color:#dc2626; }
   </style>
 </head>
 
@@ -407,7 +410,7 @@
             <fieldset class="fieldset">
               <legend>Step 1 — What do you want?</legend>
 
-              <div class="radio-grid">
+              <div class="radio-grid" id="orderTypeWrap">
                 <label class="radio-card">
                   <input type="radio" name="orderType" value="New mobile number" required>
                   <div>
@@ -424,6 +427,7 @@
                   </div>
                 </label>
               </div>
+              <span class="field-error" id="errorOrderType"></span>
 
               <div class="row">
                 <label id="packageLabelWrap">
@@ -434,6 +438,7 @@
                     <option value="Custom top up (agent will confirm)">Custom top up (agent will confirm)</option>
                   </select>
                   <div class="hint">You can change package later on WhatsApp if needed.</div>
+                  <span class="field-error" id="errorPackage"></span>
                 </label>
 
                 <label id="quantityLabelWrap">
@@ -453,11 +458,26 @@
                   <div class="hint">Number of SIM cards to order (only for new numbers).</div>
                 </label>
 
-                <label id="existingNumberLabelWrap" class="hidden">
-                  Existing number (only if top up)
-                  <input type="tel" name="existingNumber" id="existingNumberInput" placeholder="e.g. 05X-XXXXXXX">
-                  <div class="hint">If you selected "Top up existing SIM", add the number you want to top up.</div>
-                </label>
+                <div id="existingNumberLabelWrap" class="hidden" style="grid-column:1/-1;">
+                  <div class="row">
+                    <label>
+                      Country code (existing number)
+                      <input type="text" name="existingCountryCode" id="existingCountryCodeInput" list="countryCodesExisting" placeholder="+972" disabled>
+                      <datalist id="countryCodesExisting">
+                        <option value="+972">Israel (+972)</option>
+                        <option value="+1">USA/Canada (+1)</option>
+                        <option value="+44">UK (+44)</option>
+                        <option value="+66">Thailand (+66)</option>
+                      </datalist>
+                    </label>
+                    <label>
+                      Existing number (only if top up)
+                      <input type="tel" name="existingNumber" id="existingNumberInput" placeholder="e.g. 05X-XXXXXXX" disabled aria-describedby="existingNumberHint">
+                    </label>
+                  </div>
+                  <div class="hint" id="existingNumberHint">If you selected "Top up existing SIM", add the number you want to top up. The price is looked up from this number in the price list.</div>
+                  <span class="field-error" id="errorExistingNumber"></span>
+                </div>
               </div>
 
               <label style="display:block; margin-top:14px;">
@@ -518,48 +538,12 @@
                 </label>
               </div>
 
-              <div class="row">
-                <label>
-                  Country code
-                  <input type="text" name="countryCode" list="countryCodes" required placeholder="+972">
-                  <datalist id="countryCodes">
-                    <option value="+972">Israel (+972)</option>
-                    <option value="+66">Thailand (+66)</option>
-                    <option value="+1">USA/Canada (+1)</option>
-                    <option value="+44">UK (+44)</option>
-                    <option value="+61">Australia (+61)</option>
-                    <option value="+49">Germany (+49)</option>
-                    <option value="+33">France (+33)</option>
-                    <option value="+39">Italy (+39)</option>
-                    <option value="+34">Spain (+34)</option>
-                    <option value="+55">Brazil (+55)</option>
-                    <option value="+52">Mexico (+52)</option>
-                    <option value="+81">Japan (+81)</option>
-                    <option value="+82">South Korea (+82)</option>
-                    <option value="+86">China (+86)</option>
-                    <option value="+84">Vietnam (+84)</option>
-                    <option value="+62">Indonesia (+62)</option>
-                    <option value="+63">Philippines (+63)</option>
-                    <option value="+60">Malaysia (+60)</option>
-                    <option value="+65">Singapore (+65)</option>
-                    <option value="+91">India (+91)</option>
-                  </datalist>
-                  <div class="hint">Start with + and digits (example: +66).</div>
-                </label>
-
-                <label>
-                  Mobile number
-                  <input type="tel" name="mobile" id="mobileInput" required placeholder="Phone number (no country code)">
-                  <div class="hint">Example: 812345678 (no +).</div>
-                </label>
-              </div>
-
-              <!-- Phone Verification Section -->
-              <div id="phoneVerificationWrap" style="margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:#fff;">
+              <!-- Phone Verification (only for Top up existing SIM; uses Step 1 existing number – same as price) -->
+              <div id="phoneVerificationWrap" class="hidden" style="margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:#fff;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
                   <div>
                     <strong style="color:var(--brand2);">Phone Verification *</strong>
-                    <div class="hint" style="margin-top:4px;">Verify the phone number entered above to continue to payment</div>
+                    <div class="hint" style="margin-top:4px;">Verify the existing number from Step 1 to continue to payment</div>
                     <div id="phoneNumberDisplay" class="hint" style="margin-top:4px; font-weight:600; color:var(--text);"></div>
                   </div>
                   <span id="verificationStatus" style="font-size:12px; padding:4px 8px; border-radius:6px; background:var(--muted); color:#fff;">Not verified</span>
@@ -1174,6 +1158,7 @@
 // --- Toggle fields based on order type ---
     const orderTypeRadios = form.elements['orderType'];
     const existingNumberInput = document.getElementById('existingNumberInput');
+    const existingCountryCodeInput = document.getElementById('existingCountryCodeInput');
     const quantityInput = document.getElementById('quantityInput');
     const packageLabelWrap = document.getElementById('packageLabelWrap');
     const quantityLabelWrap = document.getElementById('quantityLabelWrap');
@@ -1199,13 +1184,26 @@
       if (existingNumberLabelWrap) {
         existingNumberLabelWrap.classList.toggle('hidden', !isTopUp);
       }
+      if (existingCountryCodeInput) {
+        if (isTopUp) {
+          existingCountryCodeInput.disabled = false;
+          if (!existingCountryCodeInput.value) existingCountryCodeInput.value = '+972';
+          existingCountryCodeInput.setAttribute('required', 'required');
+        } else {
+          existingCountryCodeInput.value = '';
+          existingCountryCodeInput.disabled = true;
+          existingCountryCodeInput.removeAttribute('required');
+        }
+      }
       if (existingNumberInput) {
         if (isTopUp) {
           existingNumberInput.disabled = false;
           existingNumberInput.placeholder = 'e.g. 05X-XXXXXXX';
+          existingNumberInput.setAttribute('required', 'required');
         } else {
           existingNumberInput.value = '';
           existingNumberInput.disabled = true;
+          existingNumberInput.removeAttribute('required');
         }
       }
       
@@ -1221,6 +1219,63 @@
           packageSelect.setAttribute('required', 'required');
         }
       }
+      togglePhoneVerificationVisibility();
+    }
+
+    function togglePhoneVerificationVisibility() {
+      const wrap = document.getElementById('phoneVerificationWrap');
+      if (!wrap) return;
+      const isTopUp = valueOf('orderType') === 'Top up existing SIM';
+      wrap.classList.toggle('hidden', !isTopUp);
+    }
+
+    function showStep1Errors() {
+      const orderType = valueOf('orderType');
+      const orderTypeWrap = document.getElementById('orderTypeWrap');
+      const errOrder = document.getElementById('errorOrderType');
+      const errPack = document.getElementById('errorPackage');
+      const errExisting = document.getElementById('errorExistingNumber');
+      if (orderTypeWrap) orderTypeWrap.classList.remove('step1-radio-error');
+      if (errOrder) errOrder.textContent = '';
+      if (errPack) errPack.textContent = '';
+      if (packageSelect) packageSelect.classList.remove('field-invalid');
+      if (existingNumberInput) existingNumberInput.classList.remove('field-invalid');
+      if (errExisting) errExisting.textContent = '';
+
+      let hasError = false;
+      if (!orderType) {
+        if (orderTypeWrap) orderTypeWrap.classList.add('step1-radio-error');
+        if (errOrder) errOrder.textContent = 'Please select an option.';
+        hasError = true;
+      }
+      if (orderType === 'New mobile number' && !valueOf('package')) {
+        if (packageSelect) packageSelect.classList.add('field-invalid');
+        if (errPack) errPack.textContent = 'Please select a package.';
+        hasError = true;
+      }
+      if (orderType === 'Top up existing SIM') {
+        const hasCC = existingCountryCodeInput && existingCountryCodeInput.value.trim();
+        const hasNum = existingNumberInput && existingNumberInput.value.trim();
+        if (!hasCC || !hasNum) {
+          if (existingCountryCodeInput && !hasCC) existingCountryCodeInput.classList.add('field-invalid');
+          if (existingNumberInput && !hasNum) existingNumberInput.classList.add('field-invalid');
+          if (errExisting) errExisting.textContent = 'Please enter country code and existing number.';
+          hasError = true;
+        }
+      }
+      if (hasError && orderTypeWrap) orderTypeWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function clearStep1Errors() {
+      const orderTypeWrap = document.getElementById('orderTypeWrap');
+      ['errorOrderType','errorPackage','errorExistingNumber'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '';
+      });
+      if (orderTypeWrap) orderTypeWrap.classList.remove('step1-radio-error');
+      if (packageSelect) packageSelect.classList.remove('field-invalid');
+      if (existingCountryCodeInput) existingCountryCodeInput.classList.remove('field-invalid');
+      if (existingNumberInput) existingNumberInput.classList.remove('field-invalid');
     }
 
     if (orderTypeRadios) {
@@ -1289,7 +1344,18 @@
     const otpCodeInput = document.getElementById('otpCode');
     const otpHint = document.getElementById('otpHint');
     const verificationStatus = document.getElementById('verificationStatus');
-    const mobileInput = document.getElementById('mobileInput');
+
+    // For "Top up existing SIM", OTP uses the same number as Step 1 (existing number used for price). Returns E.164 string or null.
+    function getOTPPhoneNumber() {
+      if (valueOf('orderType') !== 'Top up existing SIM') return null;
+      const cc = (existingCountryCodeInput && existingCountryCodeInput.value) ? existingCountryCodeInput.value.trim() : '';
+      const num = (existingNumberInput && existingNumberInput.value) ? existingNumberInput.value.trim() : '';
+      if (!cc || !num) return null;
+      let normCC = cc.startsWith('+') ? cc : ('+' + cc.replace(/[^0-9]/g, ''));
+      normCC = '+' + normCC.replace(/[^0-9]/g, '');
+      const normMob = num.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+      return normCC + normMob;
+    }
 
     // Update verification status UI
     function updateVerificationStatus(verified) {
@@ -1305,31 +1371,13 @@
       }
     }
 
-    // Send OTP code
+    // Send OTP code (uses Step 1 existing number for "Top up existing SIM")
     async function sendOTP() {
-      // Get phone number from Step 3 form fields
-      const countryCode = valueOf('countryCode').trim();
-      const mobile = valueOf('mobile').trim();
-      
-      if (!countryCode || !mobile) {
-        alert('Please enter country code and mobile number in Step 3 first.');
+      const fullNumber = getOTPPhoneNumber();
+      if (!fullNumber) {
+        alert('Please enter the existing number in Step 1 first (same number used for price).');
         return;
       }
-
-      // Format phone number for Twilio (E.164 format: +[country code][number] with no spaces)
-      // Ensure country code starts with +
-      let normCC = countryCode.trim();
-      if (!normCC.startsWith('+')) {
-        normCC = '+' + normCC.replace(/[^0-9]/g, '');
-      } else {
-        normCC = '+' + normCC.substring(1).replace(/[^0-9]/g, '');
-      }
-      // Remove all spaces and non-digits from mobile number
-      const normMob = mobile.replace(/\s+/g, '').replace(/[^0-9]/g, '');
-      
-      // Combine: +countrycode+number (no space)
-      const fullNumber = normCC + normMob;
-      
       console.log('Phone number formatted for Twilio:', fullNumber);
       
       sendOTPBtn.disabled = true;
@@ -1352,13 +1400,21 @@
 
         console.log('Response status:', response.status, response.statusText);
         
+        const responseText = await response.text();
+        let data = {};
+        try {
+          data = JSON.parse(responseText);
+        } catch (_) {
+          if (!response.ok) {
+            throw new Error(responseText || `Server error ${response.status}`);
+          }
+        }
         if (!response.ok) {
-          console.error('Response error:', response.status, await response.text());
+          console.error('Response error:', response.status, responseText);
+          throw new Error(data.error || responseText || `Server error ${response.status}`);
         }
         
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
+        if (data.success) {
           verificationSid = data.verificationSid;
           verificationStep1.classList.add('hidden');
           verificationStep2.classList.remove('hidden');
@@ -1393,24 +1449,10 @@
       otpHint.textContent = '';
 
       try {
-        // Get phone number from Step 3 form fields (same format as sendOTP)
-        const countryCode = valueOf('countryCode').trim();
-        const mobile = valueOf('mobile').trim();
-        
-        if (!countryCode || !mobile) {
-          throw new Error('Phone number not found. Please enter country code and mobile number.');
+        const fullNumber = getOTPPhoneNumber();
+        if (!fullNumber) {
+          throw new Error('Phone number not found. Use the existing number from Step 1.');
         }
-
-        // Format phone number for Twilio (E.164 format: +[country code][number] with no spaces)
-        let normCC = countryCode.trim();
-        if (!normCC.startsWith('+')) {
-          normCC = '+' + normCC.replace(/[^0-9]/g, '');
-        } else {
-          normCC = '+' + normCC.substring(1).replace(/[^0-9]/g, '');
-        }
-        const normMob = mobile.replace(/\s+/g, '').replace(/[^0-9]/g, '');
-        const fullNumber = normCC + normMob;
-        
         console.log('Verifying phone number:', fullNumber);
 
         // Call your backend endpoint to verify OTP
@@ -1426,16 +1468,22 @@
           })
         });
 
-        const data = await response.json();
-        
+        const responseText = await response.text();
+        let data = {};
+        try {
+          data = JSON.parse(responseText);
+        } catch (_) {
+          if (!response.ok) {
+            throw new Error(responseText || `Server error ${response.status}`);
+          }
+        }
         if (response.ok && data.success) {
           updateVerificationStatus(true);
           verificationStep2.classList.add('hidden');
           otpHint.textContent = '✓ Phone number verified successfully!';
           otpHint.style.color = 'var(--ok)';
-          mobileInput.style.borderColor = 'var(--ok)';
         } else {
-          throw new Error(data.error || 'Invalid verification code');
+          throw new Error(data.error || responseText || 'Invalid verification code');
         }
       } catch (error) {
         console.error('Error verifying OTP:', error);
@@ -1475,53 +1523,36 @@
       sendOTPBtn.disabled = true;
     }
 
-    // Function to update phone number display and enable/disable send button
+    // Function to update phone number display and enable/disable send button (uses Step 1 existing number for Top up)
     function updatePhoneNumberDisplay() {
       const phoneNumberDisplay = document.getElementById('phoneNumberDisplay');
       if (!phoneNumberDisplay) return;
       
-      const countryCode = valueOf('countryCode').trim();
-      const mobile = valueOf('mobile').trim();
-      
-      if (countryCode && mobile) {
-        // Format for display (with space)
-        let normCC = countryCode.trim();
-        if (!normCC.startsWith('+')) {
-          normCC = '+' + normCC.replace(/[^0-9]/g, '');
-        }
-        phoneNumberDisplay.textContent = `Verifying: ${normCC} ${mobile}`;
+      const fullNumber = getOTPPhoneNumber();
+      if (fullNumber) {
+        const cc = (existingCountryCodeInput && existingCountryCodeInput.value) ? existingCountryCodeInput.value.trim() : '';
+        const num = (existingNumberInput && existingNumberInput.value) ? existingNumberInput.value.trim() : '';
+        const displayCC = cc.startsWith('+') ? cc : ('+' + (cc.replace(/[^0-9]/g, '') || ''));
+        phoneNumberDisplay.textContent = `Verifying: ${displayCC} ${num}`;
         phoneNumberDisplay.style.color = 'var(--text)';
         phoneNumberDisplay.style.display = 'block';
-        
-        // Enable send button if not already verified
-        if (sendOTPBtn && !phoneVerified) {
-          sendOTPBtn.disabled = false;
-        }
+        if (sendOTPBtn && !phoneVerified) sendOTPBtn.disabled = false;
       } else {
-        phoneNumberDisplay.textContent = 'Enter country code and mobile number above first';
+        phoneNumberDisplay.textContent = 'Enter the existing number in Step 1 first (same as price lookup).';
         phoneNumberDisplay.style.color = 'var(--muted)';
-        
-        // Disable send button if phone number not complete
-        if (sendOTPBtn && !phoneVerified) {
-          sendOTPBtn.disabled = true;
-        }
+        if (sendOTPBtn && !phoneVerified) sendOTPBtn.disabled = true;
       }
     }
 
-    // Update phone number display when fields change
-    const countryCodeInput = form.elements['countryCode'];
-    const mobileInputField = form.elements['mobile'];
-    
-    if (countryCodeInput) {
-      countryCodeInput.addEventListener('input', updatePhoneNumberDisplay);
-      countryCodeInput.addEventListener('change', updatePhoneNumberDisplay);
+    // Update phone number display when Step 1 existing number fields change (OTP uses that number for Top up)
+    if (existingCountryCodeInput) {
+      existingCountryCodeInput.addEventListener('input', updatePhoneNumberDisplay);
+      existingCountryCodeInput.addEventListener('change', updatePhoneNumberDisplay);
     }
-    if (mobileInputField) {
-      mobileInputField.addEventListener('input', updatePhoneNumberDisplay);
-      mobileInputField.addEventListener('change', updatePhoneNumberDisplay);
+    if (existingNumberInput) {
+      existingNumberInput.addEventListener('input', updatePhoneNumberDisplay);
+      existingNumberInput.addEventListener('change', updatePhoneNumberDisplay);
     }
-    
-    // Initial update
     updatePhoneNumberDisplay();
 
     // --- Show Delivery Address only for: New mobile number + Physical SIM ---
@@ -1588,6 +1619,10 @@
 
       // Update conditional fields when step changes
       toggleDeliveryAddress();
+      if (current === 3) {
+        togglePhoneVerificationVisibility();
+        if (typeof updatePhoneNumberDisplay === 'function') updatePhoneNumberDisplay();
+      }
       chips.forEach(c => {
         const stepN = Number(c.dataset.step);
         c.classList.toggle('active', stepN === current);
@@ -1628,19 +1663,14 @@
       const pack = valueOf('package');
       const simType = valueOf('simType');
       
-      // For "Top up existing SIM", use Step 1 phone number; otherwise use Step 3 verification number
+      // For "Top up existing SIM", use Step 1 country code + existing number
       let num;
       if (orderType === 'Top up existing SIM') {
+        const cc = (existingCountryCodeInput && existingCountryCodeInput.value) ? existingCountryCodeInput.value.trim() : '';
         const existingNumber = valueOf('existingNumber');
-        if (existingNumber && existingNumber.trim()) {
-          // Format the Step 1 phone number for display (add +972 if it starts with 0)
-          let formatted = existingNumber.trim();
-          if (formatted.startsWith('0')) {
-            formatted = '+972 ' + formatted.substring(1);
-          } else if (!formatted.startsWith('+')) {
-            formatted = '+972 ' + formatted;
-          }
-          num = formatted;
+        if (cc && existingNumber && existingNumber.trim()) {
+          const normCC = cc.startsWith('+') ? cc : ('+' + cc.replace(/[^0-9]/g, ''));
+          num = normCC + ' ' + existingNumber.trim().replace(/\s+/g, '');
         } else {
           num = '—';
         }
@@ -1710,17 +1740,14 @@
       // Get quantity (default to 1)
       const quantity = parseInt(valueOf('quantity')) || 1;
       
-      // For "Top up existing SIM", always use price from phone lookup (Step 1 phone number)
+      // For "Top up existing SIM", price comes ONLY from the "Existing number" field (existingNumberInput)
       if (orderType === 'Top up existing SIM') {
-        // Get phone number from Step 1 (existingNumber field), NOT from Step 3 verification
-        const existingNumber = valueOf('existingNumber');
-        if (existingNumber && existingNumber.trim()) {
-          // Always do a fresh lookup to ensure we have the latest price from Excel
-          // This ensures we use the Step 1 number, not the verification number
-          const lookedUpPrice = await lookupPhonePrice(existingNumber);
+        const numberForPrice = existingNumberInput ? existingNumberInput.value.trim() : '';
+        if (numberForPrice) {
+          const lookedUpPrice = await lookupPhonePrice(numberForPrice);
           packagePrice = lookedUpPrice || 0;
         } else {
-          packagePrice = 0; // No phone number entered yet in Step 1
+          packagePrice = 0;
         }
       } else if (pack && pack !== 'Custom top up (agent will confirm)') {
         // Extract price from package string (e.g., "45 NIS / month" -> 45)
@@ -1786,22 +1813,28 @@
       if(stepN === 1){
         const orderType = valueOf('orderType');
         if (!orderType) return false;
-        // Package is only required for "New mobile number", not for "Top up existing SIM"
+        // Package is only required for "New mobile number"
         if (orderType === 'New mobile number') {
           return !!valueOf('package');
         }
-        return true; // Top up existing SIM doesn't need package
+        // "Top up existing SIM" requires country code and existing number
+        if (orderType === 'Top up existing SIM') {
+          const hasCC = existingCountryCodeInput && existingCountryCodeInput.value.trim();
+          const hasNum = (existingNumberInput && existingNumberInput.value) ? existingNumberInput.value.trim() : '';
+          return !!hasCC && !!hasNum;
+        }
+        return true;
       }
       if(stepN === 2){
         return !!valueOf('simType');
       }
 
       if(stepN === 3){
-        const basicOk = !!valueOf('firstName') && !!valueOf('lastName') && !!valueOf('countryCode') && !!valueOf('mobile');
+        const basicOk = !!valueOf('firstName') && !!valueOf('lastName');
         if(!basicOk) return false;
         
-        // Require phone verification
-        if (!phoneVerified) {
+        // Require phone verification only for "Top up existing SIM"
+        if (valueOf('orderType') === 'Top up existing SIM' && !phoneVerified) {
           alert('Please verify your phone number before continuing.');
           return false;
         }
@@ -1822,9 +1855,11 @@
 
     nextBtn.addEventListener('click', () => {
       if(!validateStep(current)){
-        alert('Please complete the required fields in this step.');
+        if (current === 1) showStep1Errors();
+        else alert('Please complete the required fields in this step.');
         return;
       }
+      if (current === 1) clearStep1Errors();
       setStep(Math.min(4, current + 1));
       updateSummary();
       window.scrollTo({ top: document.getElementById('topup').offsetTop - 10, behavior: 'smooth' });
@@ -1837,6 +1872,7 @@
     });
 
     form.addEventListener('input', () => {
+      if (current === 1) clearStep1Errors();
       if(current === 4) updateSummary();
     });
 
@@ -1924,19 +1960,14 @@
       const pack = valueOf('package');
       const simType = valueOf('simType');
       
-      // For "Top up existing SIM", use Step 1 phone number; otherwise use Step 3 verification number
+      // For "Top up existing SIM", use Step 1 country code + existing number
       let num;
       if (orderType === 'Top up existing SIM') {
+        const cc = (existingCountryCodeInput && existingCountryCodeInput.value) ? existingCountryCodeInput.value.trim() : '';
         const existingNumber = valueOf('existingNumber');
-        if (existingNumber && existingNumber.trim()) {
-          // Format the Step 1 phone number for display (add +972 if it starts with 0)
-          let formatted = existingNumber.trim();
-          if (formatted.startsWith('0')) {
-            formatted = '+972 ' + formatted.substring(1);
-          } else if (!formatted.startsWith('+')) {
-            formatted = '+972 ' + formatted;
-          }
-          num = formatted;
+        if (cc && existingNumber && existingNumber.trim()) {
+          const normCC = cc.startsWith('+') ? cc : ('+' + cc.replace(/[^0-9]/g, ''));
+          num = normCC + ' ' + existingNumber.trim().replace(/\s+/g, '');
         } else {
           num = '-';
         }
@@ -1953,16 +1984,14 @@
       // Get quantity (default to 1)
       const quantity = parseInt(valueOf('quantity')) || 1;
       
-      // For "Top up existing SIM", use price from phone lookup (Step 1 phone number)
-      // Get phone number from Step 1 (existingNumber field), NOT from Step 3 verification
+      // Price is set ONLY by the "Existing number" field (existingNumberInput), not Step 3
       if (orderType === 'Top up existing SIM') {
-        const existingNumber = valueOf('existingNumber');
-        if (existingNumber && existingNumber.trim()) {
-          // Always do a fresh lookup to ensure we have the latest price from Excel
-          const lookedUpPrice = await lookupPhonePrice(existingNumber);
+        const numberForPrice = existingNumberInput ? existingNumberInput.value.trim() : '';
+        if (numberForPrice) {
+          const lookedUpPrice = await lookupPhonePrice(numberForPrice);
           packagePrice = lookedUpPrice || 0;
         } else {
-          packagePrice = 0; // No phone number entered yet in Step 1
+          packagePrice = 0;
         }
       } else if (pack && pack !== 'Custom top up (agent will confirm)') {
         const priceMatch = pack.match(/(\d+)\s*NIS/);
