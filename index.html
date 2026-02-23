@@ -1878,7 +1878,7 @@
       return true;
     }
 
-    nextBtn.addEventListener('click', () => {
+    nextBtn.addEventListener('click', async () => {
       if(!validateStep(current)){
         if (current === 1) showStep1Errors();
         else alert('Please complete the required fields in this step.');
@@ -1886,6 +1886,17 @@
       }
       if (current === 1) clearStep1Errors();
       const isTopUp = valueOf('orderType') === 'Top up existing SIM';
+      // If Top up and number not in price list, send to WhatsApp instead of payment
+      if (current === 1 && isTopUp) {
+        const numberForPrice = existingNumberInput ? existingNumberInput.value.trim() : '';
+        if (numberForPrice) {
+          const price = await lookupPhonePrice(numberForPrice);
+          if (price == null || price <= 0) {
+            window.open('https://wa.me/972512965990', '_blank');
+            return;
+          }
+        }
+      }
       const nextStep = (current === 1 && isTopUp) ? 4 : Math.min(4, current + 1);
       setStep(nextStep);
       updateSummary();
