@@ -477,6 +477,32 @@
                   </div>
                   <div class="hint" id="existingNumberHint">If you selected "Top up existing SIM", add the number you want to top up. The price is looked up from this number in the price list.</div>
                   <span class="field-error" id="errorExistingNumber"></span>
+
+                  <!-- Phone Verification (Top up: verify the number above before continuing) -->
+                  <div id="phoneVerificationWrap" class="hidden" style="margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:#fff;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                      <div>
+                        <strong style="color:var(--brand2);">Phone Verification *</strong>
+                        <div class="hint" style="margin-top:4px;">Verify the number above to continue</div>
+                        <div id="phoneNumberDisplay" class="hint" style="margin-top:4px; font-weight:600; color:var(--text);"></div>
+                      </div>
+                      <span id="verificationStatus" style="font-size:12px; padding:4px 8px; border-radius:6px; background:var(--muted); color:#fff;">Not verified</span>
+                    </div>
+                    <div id="verificationStep1" style="display:flex; gap:8px; margin-top:10px;">
+                      <button type="button" class="btn-small primary" id="sendOTPBtn" style="flex:1;">Send Verification Code</button>
+                    </div>
+                    <div id="verificationStep2" class="hidden" style="margin-top:10px;">
+                      <div class="hint" style="margin-bottom:8px;">Enter the 6-digit code sent to your phone:</div>
+                      <div style="display:flex; gap:8px;">
+                        <input type="text" id="otpCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}" style="flex:1; text-align:center; font-size:18px; letter-spacing:4px; font-weight:bold;">
+                        <button type="button" class="btn-small primary" id="verifyOTPBtn">Verify</button>
+                      </div>
+                      <div style="display:flex; gap:8px; margin-top:8px;">
+                        <button type="button" class="btn-small ghost" id="resendOTPBtn" style="flex:1;">Resend Code</button>
+                      </div>
+                      <div class="hint" id="otpHint" style="margin-top:6px;"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -538,37 +564,13 @@
                 </label>
               </div>
 
-              <!-- Phone Verification (only for Top up existing SIM; uses Step 1 existing number – same as price) -->
-              <div id="phoneVerificationWrap" class="hidden" style="margin-top:14px; padding:14px; border:1px solid var(--border); border-radius:12px; background:#fff;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-                  <div>
-                    <strong style="color:var(--brand2);">Phone Verification *</strong>
-                    <div class="hint" style="margin-top:4px;">Verify the existing number from Step 1 to continue to payment</div>
-                    <div id="phoneNumberDisplay" class="hint" style="margin-top:4px; font-weight:600; color:var(--text);"></div>
-                  </div>
-                  <span id="verificationStatus" style="font-size:12px; padding:4px 8px; border-radius:6px; background:var(--muted); color:#fff;">Not verified</span>
-                </div>
-                
-                <div id="verificationStep1" style="display:flex; gap:8px; margin-top:10px;">
-                  <button type="button" class="btn-small primary" id="sendOTPBtn" style="flex:1;">Send Verification Code</button>
-                </div>
-                
-                <div id="verificationStep2" class="hidden" style="margin-top:10px;">
-                  <div class="hint" style="margin-bottom:8px;">Enter the 6-digit code sent to your phone:</div>
-                  <div style="display:flex; gap:8px;">
-                    <input type="text" id="otpCode" placeholder="000000" maxlength="6" pattern="[0-9]{6}" style="flex:1; text-align:center; font-size:18px; letter-spacing:4px; font-weight:bold;">
-                    <button type="button" class="btn-small primary" id="verifyOTPBtn">Verify</button>
-                  </div>
-                  <div style="display:flex; gap:8px; margin-top:8px;">
-                    <button type="button" class="btn-small ghost" id="resendOTPBtn" style="flex:1;">Resend Code</button>
-                  </div>
-                  <div class="hint" id="otpHint" style="margin-top:6px;"></div>
-                </div>
-              </div>
-
               <label id="emailWrap" style="display:block; margin-top:14px;">
                 Email address (optional)
                 <input type="email" name="email" placeholder="you@example.com">
+              </label>
+              <label style="display:block; margin-top:14px;">
+                Phone number
+                <input type="tel" name="contactPhone" placeholder="e.g. +972 50 123 4567">
               </label>
               <div id="addressWrap" class="hidden" style="margin-top:10px;">
                 <div class="row">
@@ -604,7 +606,7 @@
           <!-- STEP 4 -->
           <div class="step hidden" data-step="4">
             <fieldset class="fieldset">
-              <legend>Step 4 — Payment method</legend>
+              <legend id="step4Legend">Step 4 — Payment method</legend>
 
               <div class="radio-grid">
                 <label class="radio-card">
@@ -652,6 +654,7 @@
                 <div class="item"><b>Number:</b> <span id="sNum">—</span></div>
                 <div class="item"><b>Name:</b> <span id="sName">—</span></div>
                 <div class="item" id="emailSummaryRow"><b>Email:</b> <span id="sEmail">—</span></div>
+                <div class="item" id="contactPhoneSummaryRow"><b>Phone:</b> <span id="sContactPhone">—</span></div>
                 <div class="item hidden" id="addrSummaryRow"><b>Address:</b> <span id="sAddr">—</span></div>
                 <div class="item hidden" id="couponSummaryRow"><b>Coupon:</b> <span id="sCoupon">—</span></div>
                 <div class="item hidden" id="discountSummaryRow"><b>Discount:</b> <span id="sDiscount" style="color:var(--ok);">—</span></div>
@@ -1236,8 +1239,9 @@
       const chip3 = document.querySelector('.step-chip[data-step="3"]');
       const chip4 = document.querySelector('.step-chip[data-step="4"]');
       if (chip2) chip2.classList.toggle('hidden', isTopUp);
-      if (chip3) chip3.textContent = isTopUp ? '2) Details' : '3) Details';
-      if (chip4) chip4.textContent = isTopUp ? '3) Payment' : '4) Payment';
+      if (chip3) chip3.classList.toggle('hidden', isTopUp);
+      if (chip3) chip3.textContent = '3) Details';
+      if (chip4) chip4.textContent = isTopUp ? '2) Payment' : '4) Payment';
     }
 
     function togglePhoneVerificationVisibility() {
@@ -1556,7 +1560,7 @@
         phoneNumberDisplay.style.display = 'block';
         if (sendOTPBtn && !phoneVerified) sendOTPBtn.disabled = false;
       } else {
-        phoneNumberDisplay.textContent = 'Enter the existing number in Step 1 first (same as price lookup).';
+        phoneNumberDisplay.textContent = '';
         phoneNumberDisplay.style.color = 'var(--muted)';
         if (sendOTPBtn && !phoneVerified) sendOTPBtn.disabled = true;
       }
@@ -1638,10 +1642,12 @@
 
       // Update conditional fields when step changes
       toggleDeliveryAddress();
-      if (current === 3) {
+      if (current === 1) {
         togglePhoneVerificationVisibility();
         if (typeof updatePhoneNumberDisplay === 'function') updatePhoneNumberDisplay();
       }
+      const step4Legend = document.getElementById('step4Legend');
+      if (step4Legend) step4Legend.textContent = (valueOf('orderType') === 'Top up existing SIM' ? 'Step 2 — Payment method' : 'Step 4 — Payment method');
       chips.forEach(c => {
         const stepN = Number(c.dataset.step);
         c.classList.toggle('active', stepN === current);
@@ -1708,6 +1714,11 @@
       document.getElementById('sNum').textContent = num || '—';
       document.getElementById('sName').textContent = name || '—';
       document.getElementById('sEmail').textContent = email || '—';
+      const contactPhone = valueOf('contactPhone').trim();
+      const contactPhoneRow = document.getElementById('contactPhoneSummaryRow');
+      const sContactPhone = document.getElementById('sContactPhone');
+      if (sContactPhone) sContactPhone.textContent = contactPhone || '—';
+      if (contactPhoneRow) contactPhoneRow.classList.toggle('hidden', orderType !== 'New mobile number');
 
       const emailRow = document.getElementById('emailSummaryRow');
       if(emailRow){
@@ -1837,11 +1848,11 @@
         if (orderType === 'New mobile number') {
           return !!valueOf('package');
         }
-        // "Top up existing SIM" requires country code and existing number
+        // "Top up existing SIM" requires country code, existing number, and phone verification (OTP in Step 1)
         if (orderType === 'Top up existing SIM') {
           const hasCC = existingCountryCodeInput && existingCountryCodeInput.value.trim();
           const hasNum = (existingNumberInput && existingNumberInput.value) ? existingNumberInput.value.trim() : '';
-          return !!hasCC && !!hasNum;
+          return !!hasCC && !!hasNum && phoneVerified;
         }
         return true;
       }
@@ -1852,13 +1863,7 @@
       if(stepN === 3){
         const basicOk = !!valueOf('firstName') && !!valueOf('lastName');
         if(!basicOk) return false;
-        
-        // Require phone verification only for "Top up existing SIM"
-        if (valueOf('orderType') === 'Top up existing SIM' && !phoneVerified) {
-          alert('Please verify your phone number before continuing.');
-          return false;
-        }
-        
+        // Phone verification is done in Step 1 for "Top up existing SIM"
         if(needsDeliveryAddress()){
           return !!valueOf('addrCountry') && !!valueOf('addrCity') && !!valueOf('addrStreet') && !!valueOf('addrZip');
         }
@@ -1881,7 +1886,7 @@
       }
       if (current === 1) clearStep1Errors();
       const isTopUp = valueOf('orderType') === 'Top up existing SIM';
-      const nextStep = (current === 1 && isTopUp) ? 3 : Math.min(4, current + 1);
+      const nextStep = (current === 1 && isTopUp) ? 4 : Math.min(4, current + 1);
       setStep(nextStep);
       updateSummary();
       window.scrollTo({ top: document.getElementById('topup').offsetTop - 10, behavior: 'smooth' });
@@ -1889,7 +1894,7 @@
 
     backBtn.addEventListener('click', () => {
       const isTopUp = valueOf('orderType') === 'Top up existing SIM';
-      const prevStep = (current === 3 && isTopUp) ? 1 : Math.max(1, current - 1);
+      const prevStep = (current === 4 && isTopUp) ? 1 : Math.max(1, current - 1);
       setStep(prevStep);
       updateSummary();
       window.scrollTo({ top: document.getElementById('topup').offsetTop - 10, behavior: 'smooth' });
@@ -2001,6 +2006,7 @@
       
       const name = [valueOf('firstName'), valueOf('lastName')].filter(Boolean).join(' ');
       const email = valueOf('email');
+      const contactPhone = valueOf('contactPhone').trim();
       const pay = valueOf('payment');
       
       // Calculate price
@@ -2050,6 +2056,7 @@
         `• Number: ${num || '-'}`,
         `• Full name: ${name || '-'}`,
         ...( (!needsDeliveryAddress() && email) ? [`• Email: ${email}`] : [] ),
+        ...( orderType === 'New mobile number' && contactPhone ? [`• Phone: ${contactPhone}`] : [] ),
         ...( appliedCoupon ? [`• Coupon: ${appliedCoupon.code} (${appliedCoupon.type === 'percent' ? appliedCoupon.discount + '%' : appliedCoupon.discount + ' NIS'} discount)`] : [] ),
         ...( packagePrice > 0 ? [`• Package Price: ${packagePrice} ILS${orderType === 'New mobile number' && quantity > 1 ? ` (${(packagePrice / quantity).toFixed(2)} ILS × ${quantity})` : ''}`] : [] ),
         ...( shippingFee > 0 ? [`• Shipping fee: ${shippingFee} ILS${quantity > 1 ? ` (${(shippingFee / quantity).toFixed(2)} ILS × ${quantity})` : ''}`] : [] ),
