@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact Us</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f5f7fa; }
+
+    .contact-section { padding: 60px 20px; }
+
+    .return-btn{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background: #fff;
+      color: #0f4c81;
+      text-decoration: none;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 20px;
+    }
+    .return-btn:hover{ text-decoration: none; color: #0f4c81; }
+    .contact-wrap { max-width: 620px; margin: 0 auto; }
+
+    .contact-card {
+      background: white;
+      border-radius: 18px;
+      padding: 30px;
+      border: 1px solid #eef2f6;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    }
+
+    .contact-card h2 {
+      font-size: 26px;
+      margin-bottom: 8px;
+      color: #0b4a8b;
+    }
+
+    .contact-card p {
+      color: #6b7280;
+      margin-bottom: 22px;
+      line-height: 1.4;
+    }
+
+    .helper {
+      background: #f3f8ff;
+      border: 1px solid #dbeafe;
+      color: #1f4f8a;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+      font-size: 14px;
+    }
+
+    form { display: flex; flex-direction: column; gap: 16px; }
+
+    .input-group { display: flex; flex-direction: column; }
+
+    label { font-size: 14px; margin-bottom: 6px; color: #374151; }
+
+    input, select, textarea {
+      padding: 11px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #1d7df2;
+      box-shadow: 0 0 0 3px rgba(29,125,242,0.1);
+    }
+
+    button {
+      margin-top: 6px;
+      padding: 13px;
+      border-radius: 12px;
+      border: none;
+      background: #1d7df2;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover { background: #1666c1; }
+  </style>
+</head>
+
+<body>
+
+<div class="contact-wrap">
+  <a href="index.html" class="return-btn">← Return to Home</a>
+</div>
+
+<section class="contact-section">
+  <div class="contact-wrap">
+    <div class="contact-card">
+      <h2>We're here to help 😊</h2>
+      <p>Have a question about SIM / eSIM, top-ups, or plans? Send us a message and we'll get back to you as soon as possible.</p>
+
+      <div class="helper">
+        💬 Our support team usually replies quickly.<br>
+        ⚡ Need urgent help? Contact us via WhatsApp.
+      </div>
+
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" name="name" placeholder="Your full name" required>
+        </div>
+
+        <div class="input-group">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="Your email address" required>
+        </div>
+
+        <div class="input-group">
+          <label>Phone / WhatsApp</label>
+          <input type="tel" name="phone" placeholder="Optional">
+        </div>
+
+        <div class="input-group">
+          <label>Inquiry Type</label>
+          <select name="inquiry">
+            <option>General Question</option>
+            <option>New SIM / eSIM</option>
+            <option>Top-Up Existing SIM</option>
+            <option>Customer Support</option>
+            <option>Business Partners / Affilate </option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Message</label>
+          <textarea name="message" rows="4" placeholder="Tell us what you need — we're happy to help 😊" required></textarea>
+        </div>
+
+        <button type="submit">Send Message 💬</button>
+
+      </form>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
