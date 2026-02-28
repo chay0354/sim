@@ -2150,7 +2150,8 @@
       const orderText = decodeURIComponent(encoded);
 
       if (pay === "Credit card") {
-        // Credit card: go to payment first; SMS is sent only after payment (on success page)
+        // Same as other 3: after payment user goes to order-confirmation.html, which sends SMS there
+        // Set Cardcom success/return URL to your site's order-confirmation.html
         sessionStorage.setItem('pendingOrderSms', orderText);
         const totalShekels = (typeof window.__lastOrderTotal === 'number' && window.__lastOrderTotal > 0)
           ? window.__lastOrderTotal

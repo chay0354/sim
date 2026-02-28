@@ -44,9 +44,26 @@
 <body>
   <div class="card">
     <div class="ok">✅</div>
-    <h1>Order confirmed</h1>
-    <p>We've received your order. We'll be in touch with payment details or next steps (Bit / PayBox, bank transfer, or pickup) as needed.</p>
+    <h1 id="confirmationTitle">Order confirmed</h1>
+    <p id="confirmationMessage">We've received your order. We'll be in touch with payment details or next steps (Bit / PayBox, bank transfer, or pickup) as needed.</p>
     <a href="index.html">Return to Home</a>
   </div>
+  <script>
+    (function() {
+      // Same as the other 3 options: send order SMS to backend, then show confirmation
+      var orderText = sessionStorage.getItem('pendingOrderSms');
+      if (orderText) {
+        sessionStorage.removeItem('pendingOrderSms');
+        var base = 'https://verification-server-livid.vercel.app';
+        fetch(base + '/api/send-order-sms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: orderText })
+        }).catch(function() {});
+        document.getElementById('confirmationTitle').textContent = 'Payment successful';
+        document.getElementById('confirmationMessage').textContent = "Thank you for your order. We'll confirm your SIM / top-up and get in touch if needed.";
+      }
+    })();
+  </script>
 </body>
 </html>
