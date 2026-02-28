@@ -736,6 +736,8 @@
     const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/REPLACE_ME";
     // PayPal: use paypal.me link or a hosted checkout link
     const PAYPAL_PAYMENT_LINK = "https://www.paypal.me/REPLACE_ME";
+    // Cardcom payment page – after success, set redirect in Cardcom to your site's success.html
+    const CARDCOM_PAYMENT_URL = "https://secure.cardcom.solutions/EA/EA5/iNBMGREX8EKu6SBNNNCoQ/PaymentSP";
 
     // --- COUPON SYSTEM CONFIGURATION ---
     // Option 1: Google Sheets (make sure sheet is public/anyone with link can view)
@@ -1808,6 +1810,7 @@
       }
       
       const total = Math.max(0, subtotal - discountAmount);
+      window.__lastOrderTotal = total; // for Cardcom redirect
       
       // Always display prices
       if (packagePriceRow) {
@@ -1858,10 +1861,14 @@
         return true;
       }
       if(stepN === 2){
+        // Step 2 is skipped for "Top up existing SIM"
+        if (valueOf('orderType') === 'Top up existing SIM') return true;
         return !!valueOf('simType');
       }
 
       if(stepN === 3){
+        // Step 3 is skipped for "Top up existing SIM"
+        if (valueOf('orderType') === 'Top up existing SIM') return true;
         const basicOk = !!valueOf('firstName') && !!valueOf('lastName');
         if(!basicOk) return false;
         // Phone verification is done in Step 1 for "Top up existing SIM"
@@ -1877,6 +1884,39 @@
         return paymentOk && termsAccepted;
       }
       return true;
+    }
+
+    function getValidationErrors() {
+      const missing = [];
+      const orderType = valueOf('orderType');
+      // Step 1
+      if (!orderType) { missing.push('Step 1: Order type (New number / Top up)'); return missing; }
+      if (orderType === 'New mobile number' && !valueOf('package')) missing.push('Step 1: Package');
+      if (orderType === 'Top up existing SIM') {
+        const hasCC = existingCountryCodeInput && existingCountryCodeInput.value.trim();
+        const hasNum = (existingNumberInput && existingNumberInput.value) ? existingNumberInput.value.trim() : '';
+        if (!hasCC) missing.push('Step 1: Country code (e.g. +972)');
+        if (!hasNum) missing.push('Step 1: Existing phone number');
+        if (!phoneVerified) missing.push('Step 1: Phone verification (enter and verify OTP code)');
+      }
+      // Step 2 (skipped for Top up)
+      if (orderType !== 'Top up existing SIM' && !valueOf('simType'))
+        missing.push('Step 2: SIM type (eSIM or Physical SIM)');
+      // Step 3 (skipped for Top up)
+      if (orderType !== 'Top up existing SIM') {
+        if (!valueOf('firstName')) missing.push('Step 3: First name');
+        if (!valueOf('lastName')) missing.push('Step 3: Last name');
+        if (needsDeliveryAddress()) {
+          if (!valueOf('addrCountry')) missing.push('Step 3: Address – Country');
+          if (!valueOf('addrCity')) missing.push('Step 3: Address – City');
+          if (!valueOf('addrStreet')) missing.push('Step 3: Address – Street');
+          if (!valueOf('addrZip')) missing.push('Step 3: Address – ZIP');
+        }
+      }
+      // Step 4
+      if (!valueOf('payment')) missing.push('Step 4: Payment method');
+      if (!document.getElementById('acceptTerms')?.checked) missing.push('Step 4: Accept Terms of Use and Privacy Policy');
+      return missing;
     }
 
     nextBtn.addEventListener('click', async () => {
@@ -2059,6 +2099,7 @@
       }
       const total = Math.max(0, subtotal - discountAmount);
       
+      const addr = [valueOf('addrCountry'), valueOf('addrCity'), valueOf('addrStreet'), valueOf('addrZip')].filter(Boolean).join(', ');
       const parts = [
         "Hello AllNetworks, I'd like to place an order/top-up:",
         `• Order: ${orderType || '-'}`,
@@ -2068,6 +2109,7 @@
         `• Number: ${num || '-'}`,
         `• Full name: ${name || '-'}`,
         ...( (!needsDeliveryAddress() && email) ? [`• Email: ${email}`] : [] ),
+        ...( needsDeliveryAddress() && addr ? [`• Address: ${addr}`] : [] ),
         ...( orderType === 'New mobile number' && contactPhone ? [`• Phone: ${contactPhone}`] : [] ),
         ...( appliedCoupon ? [`• Coupon: ${appliedCoupon.code} (${appliedCoupon.type === 'percent' ? appliedCoupon.discount + '%' : appliedCoupon.discount + ' NIS'} discount)`] : [] ),
         ...( packagePrice > 0 ? [`• Package Price: ${packagePrice} ILS${orderType === 'New mobile number' && quantity > 1 ? ` (${(packagePrice / quantity).toFixed(2)} ILS × ${quantity})` : ''}`] : [] ),
@@ -2091,40 +2133,47 @@
       window.open(url, '_blank');
     });
 
-    // --- Submit handler (no backend by default) ---
-    form.addEventListener('submit', (e) => {
+    // --- Submit handler ---
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      updateSummary();
+      await updateSummary();
 
-      if(!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)){
-        alert('Please complete all steps before submitting.');
+      const errors = getValidationErrors();
+      if (errors.length > 0) {
+        console.log('Validation failed – missing:', errors);
+        alert('Please complete all steps before submitting.\n\nMissing:\n• ' + errors.join('\n• '));
         return;
       }
 
       const pay = valueOf('payment');
+      const encoded = await buildWhatsAppText();
+      const orderText = decodeURIComponent(encoded);
 
-      // Basic success message
-      submitHint.textContent = "Order saved locally. If you chose an online payment method, you’ll be redirected now. Otherwise, send the order on WhatsApp to confirm.";
-      submitHint.style.color = "#0f5132";
-
-      // Redirect for online payments
-      if(pay === "Stripe (online)"){
-        if(STRIPE_PAYMENT_LINK.includes("REPLACE_ME")){
-          alert("Stripe link is not configured yet. Please replace STRIPE_PAYMENT_LINK in the code.");
-          return;
-        }
-        window.open(STRIPE_PAYMENT_LINK, "_blank");
+      if (pay === "Credit card") {
+        // Credit card: go to payment first; SMS is sent only after payment (on success page)
+        sessionStorage.setItem('pendingOrderSms', orderText);
+        const totalShekels = (typeof window.__lastOrderTotal === 'number' && window.__lastOrderTotal > 0)
+          ? window.__lastOrderTotal
+          : (() => { const t = document.getElementById('sTotal')?.textContent || ''; const m = t.match(/[\d.,]+/); return m ? parseFloat(m[0].replace(',','')) : 0; })();
+        const sep = CARDCOM_PAYMENT_URL.indexOf('?') !== -1 ? '&' : '?';
+        const val = totalShekels > 0 ? totalShekels.toFixed(2) : '';
+        const cardcomUrl = val
+          ? CARDCOM_PAYMENT_URL + sep + 'Sum=' + val + '&Amount=' + val
+          : CARDCOM_PAYMENT_URL;
+        window.location.href = cardcomUrl;
         return;
       }
 
-      if(pay === "PayPal (online)"){
-        if(PAYPAL_PAYMENT_LINK.includes("REPLACE_ME")){
-          alert("PayPal link is not configured yet. Please replace PAYPAL_PAYMENT_LINK in the code.");
-          return;
-        }
-        window.open(PAYPAL_PAYMENT_LINK, "_blank");
-        return;
-      }
+      // Bit / PayBox, Bank transfer, Cash (pickup): send SMS then redirect to order confirmation page
+      try {
+        const base = TWILIO_BACKEND_URL.replace(/\/api\/?$/, '');
+        await fetch(base + '/api/send-order-sms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: orderText })
+        });
+      } catch (_) {}
+      window.location.href = 'order-confirmation.html';
     });
 
     </script>
